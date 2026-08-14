@@ -78,6 +78,26 @@ country:
 3. Everything else — filtering, sorting, the shortlist, CSV export — keeps
    working unchanged.
 
+## Top majors filter
+
+Each school now lists its top 10 bachelor's-level majors, ranked by number of
+graduates (the biggest, most established programs — not just anything
+technically offered). These show as tags on each card and power the new
+"Major" filter dropdown.
+
+**If you re-run `fetch-data.js` and every school's majors list comes back
+empty**, College Scorecard's nested program-data field names may not exactly
+match what the script expects (this part of their API isn't fully
+documented). To fix it:
+
+1. Run the script and look at the console output — it prints a "Sample raw
+   program data" block near the top showing the real field names for the
+   first school.
+2. Compare that to the field names used in `topBachelorsPrograms()` near the
+   top of `scripts/fetch-data.js` (currently `title`, `credential.level`,
+   `counts.ipeds_awards2`) and adjust them to match.
+3. Re-run the script.
+
 ## Notes on the data
 
 - Tuition, admission rate, grad rate, and earnings figures come from the

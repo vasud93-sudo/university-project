@@ -6,6 +6,7 @@ let shortlistIds = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]")
 const els = {
   search: document.getElementById("f-search"),
   state: document.getElementById("f-state"),
+  major: document.getElementById("f-major"),
   ownership: document.getElementById("f-ownership"),
   tuition: document.getElementById("f-tuition"),
   admit: document.getElementById("f-admit"),
@@ -31,6 +32,7 @@ async function init() {
   const res = await fetch("data/schools.json");
   schools = await res.json();
   populateStateFilter();
+  populateMajorFilter();
   bindEvents();
   render();
   saveShortlist(); // sync count badge on load
@@ -46,8 +48,18 @@ function populateStateFilter() {
   }
 }
 
+function populateMajorFilter() {
+  const majors = [...new Set(schools.flatMap((s) => s.topPrograms || []))].sort();
+  for (const major of majors) {
+    const opt = document.createElement("option");
+    opt.value = major;
+    opt.textContent = major;
+    els.major.appendChild(opt);
+  }
+}
+
 function bindEvents() {
-  [els.search, els.state, els.ownership, els.tuition, els.admit, els.sort].forEach((el) =>
+  [els.search, els.state, els.major, els.ownership, els.tuition, els.admit, els.sort].forEach((el) =>
     el.addEventListener("input", render)
   );
 
@@ -72,6 +84,7 @@ function setDrawer(open) {
 function getFiltered() {
   const q = els.search.value.trim().toLowerCase();
   const state = els.state.value;
+  const major = els.major.value;
   const ownership = els.ownership.value;
   const maxTuition = els.tuition.value ? Number(els.tuition.value) : null;
   const minAdmit = els.admit.value ? Number(els.admit.value) : null;
@@ -79,6 +92,7 @@ function getFiltered() {
   let list = schools.filter((s) => {
     if (q && !`${s.name} ${s.city}`.toLowerCase().includes(q)) return false;
     if (state && s.state !== state) return false;
+    if (major && !(s.topPrograms || []).includes(major)) return false;
     if (ownership && s.ownership !== ownership) return false;
     if (maxTuition != null && (s.tuitionOutOfState == null || s.tuitionOutOfState > maxTuition)) return false;
     if (minAdmit != null && (s.admissionRate == null || s.admissionRate < minAdmit)) return false;
@@ -133,6 +147,7 @@ function cardHtml(s) {
         <div><span class="stat-label">Median earnings (10yr)</span><span class="stat-value">${fmtMoney(s.medianEarnings10yr)}</span></div>
         <div><span class="stat-label">Enrollment</span><span class="stat-value">${fmtInt(s.enrollment)}</span></div>
       </div>
+      ${programsHtml(s.topPrograms)}
       <div class="uni-card-foot">
         <a class="uni-card-link" href="https://${s.url}" target="_blank" rel="noopener">${s.url || ""}</a>
         <button class="pull-button ${pulled ? "pulled" : ""}" data-id="${s.id}">
@@ -140,6 +155,20 @@ function cardHtml(s) {
         </button>
       </div>
     </article>
+  `;
+}
+
+function programsHtml(topPrograms) {
+  if (!topPrograms || topPrograms.length === 0) return "";
+  const shown = topPrograms.slice(0, 4);
+  const remaining = topPrograms.length - shown.length;
+  const chips = shown.map((p) => `<span class="major-chip">${p}</span>`).join("");
+  const more = remaining > 0 ? `<span class="major-chip major-chip-more">+${remaining} more</span>` : "";
+  return `
+    <div class="uni-card-majors">
+      <span class="stat-label">Top majors</span>
+      <div class="major-chip-row">${chips}${more}</div>
+    </div>
   `;
 }
 
@@ -180,13 +209,14 @@ function exportCsv() {
   }
   const headers = [
     "Name", "City", "State", "Type", "Tuition (in-state)", "Tuition (out-of-state)",
-    "Admission rate", "Enrollment", "4yr Grad rate", "Median earnings (10yr)", "URL",
+    "Admission rate", "Enrollment", "4yr Grad rate", "Median earnings (10yr)",
+    "Top majors (bachelor's)", "URL",
   ];
   const rows = items.map((s) => [
     s.name, s.city, s.state, s.ownership,
     s.tuitionInState ?? "", s.tuitionOutOfState ?? "",
     s.admissionRate ?? "", s.enrollment ?? "", s.gradRate4yr ?? "",
-    s.medianEarnings10yr ?? "", s.url ?? "",
+    s.medianEarnings10yr ?? "", (s.topPrograms || []).join("; "), s.url ?? "",
   ]);
   const csv = [headers, ...rows]
     .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))

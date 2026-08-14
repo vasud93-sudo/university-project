@@ -257,6 +257,34 @@ main {
 
 .stat-value { font-weight: 600; }
 
+.uni-card-majors {
+  border-top: 1px dashed var(--brass);
+  padding-top: 10px;
+}
+
+.major-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.major-chip {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  background: var(--paper);
+  border: 1px solid var(--brass-line);
+  color: var(--ink-soft);
+  border-radius: 12px;
+  padding: 3px 9px;
+}
+
+.major-chip-more {
+  font-family: var(--font-mono);
+  color: var(--library-green-dark);
+  border-color: var(--library-green-dark);
+}
+
 .uni-card-foot {
   margin-top: auto;
   display: flex;

@@ -28,8 +28,18 @@ const FIELDS = [
   "latest.student.size",
   "latest.completion.completion_rate_4yr_150nt",
   "latest.earnings.10_yrs_after_entry.median",
-  "latest.programs.cip_4_digit", // used to derive rough program/major tags
+  // Nested field-of-study data: one entry per major offered at the school.
+  // all_programs_nested=true (added below) returns every program, not just
+  // ones matching a filter — we need the full list to rank them ourselves.
+  "latest.programs.cip_4_digit.title",
+  "latest.programs.cip_4_digit.credential.level",
+  "latest.programs.cip_4_digit.counts.ipeds_awards2",
 ].join(",");
+
+// Credential level 3 = Bachelor's degree, per College Scorecard's glossary
+// (1=undergrad certificate, 2=associate's, 3=bachelor's, 4+=grad-level).
+const BACHELORS_CREDENTIAL_LEVEL = 3;
+const TOP_PROGRAMS_PER_SCHOOL = 10;
 
 // Keep the dataset to currently-operating, degree-granting 4-year schools
 // so the filtered list stays useful instead of huge.
@@ -41,12 +51,26 @@ const FILTERS = [
 const PER_PAGE = 100;
 
 async function fetchPage(page) {
-  const url = `${BASE_URL}?api_key=${API_KEY}&fields=${FIELDS}&${FILTERS}&per_page=${PER_PAGE}&page=${page}`;
+  const url = `${BASE_URL}?api_key=${API_KEY}&fields=${FIELDS}&${FILTERS}&per_page=${PER_PAGE}&page=${page}&all_programs_nested=true`;
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error(`Request failed (${res.status}): ${await res.text()}`);
   }
   return res.json();
+}
+
+// Picks the school's top N bachelor's-level majors by number of graduates.
+// If the nested program data comes back empty or in an unexpected shape,
+// this safely returns [] instead of crashing the whole fetch — see the
+// troubleshooting note in README.md if that happens.
+function topBachelorsPrograms(rawPrograms) {
+  if (!Array.isArray(rawPrograms)) return [];
+
+  return rawPrograms
+    .filter((p) => p && p["credential.level"] === BACHELORS_CREDENTIAL_LEVEL && p.title)
+    .sort((a, b) => (b["counts.ipeds_awards2"] ?? 0) - (a["counts.ipeds_awards2"] ?? 0))
+    .slice(0, TOP_PROGRAMS_PER_SCHOOL)
+    .map((p) => p.title);
 }
 
 function ownershipLabel(code) {
@@ -67,9 +91,7 @@ function normalize(raw) {
     enrollment: raw["latest.student.size"],
     gradRate4yr: raw["latest.completion.completion_rate_4yr_150nt"],
     medianEarnings10yr: raw["latest.earnings.10_yrs_after_entry.median"],
-    programCodes: raw["latest.programs.cip_4_digit"]
-      ? raw["latest.programs.cip_4_digit"].map((p) => p.code)
-      : [],
+    topPrograms: topBachelorsPrograms(raw["latest.programs.cip_4_digit"]),
   };
 }
 
@@ -79,10 +101,27 @@ async function main() {
   let page = 0;
   let total = Infinity;
   const results = [];
+  let loggedSampleProgram = false;
 
   while (results.length < total) {
     const data = await fetchPage(page);
     total = data.metadata.total;
+
+    // One-time sanity check: print the raw shape of the first school's
+    // program data so you can confirm the field names below are correct.
+    // If topPrograms end up empty for every school, compare this printout
+    // against the field names used in topBachelorsPrograms() above and
+    // adjust them to match (College Scorecard's nested field names have
+    // shifted before between API versions).
+    if (!loggedSampleProgram && data.results[0]) {
+      console.log(
+        "\nSample raw program data (for verifying field names):\n",
+        JSON.stringify(data.results[0]["latest.programs.cip_4_digit"], null, 2).slice(0, 800),
+        "\n"
+      );
+      loggedSampleProgram = true;
+    }
+
     results.push(...data.results.map(normalize));
     console.log(`  page ${page + 1}: ${results.length}/${total} schools`);
     page += 1;
