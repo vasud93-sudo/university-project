@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>US University Catalog — build your own shortlist</title>
+<meta name="description" content="A free, filterable catalog of US universities built on Department of Education College Scorecard data. Pull cards into a shortlist and export it as CSV." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="masthead-title">
+      <span class="eyebrow">College Scorecard, filtered</span>
+      <h1>US University Catalog</h1>
+      <p class="tagline">Pull cards into a shortlist. Export it. Build your own sheet.</p>
+    </div>
+    <button id="shortlist-toggle" class="drawer-toggle" aria-expanded="false" aria-controls="shortlist-drawer">
+      <span class="stamp-icon">☐</span>
+      <span>Shortlist</span>
+      <span id="shortlist-count" class="count-badge">0</span>
+    </button>
+  </div>
+</header>
+
+<section class="filter-rack" aria-label="Filters">
+  <div class="filter-rack-inner">
+    <div class="filter-tab">
+      <label for="f-search">Search</label>
+      <input id="f-search" type="text" placeholder="School or city…" autocomplete="off" />
+    </div>
+    <div class="filter-tab">
+      <label for="f-state">State</label>
+      <select id="f-state"><option value="">All states</option></select>
+    </div>
+    <div class="filter-tab">
+      <label for="f-ownership">Type</label>
+      <select id="f-ownership">
+        <option value="">Public &amp; private</option>
+        <option value="Public">Public</option>
+        <option value="Private nonprofit">Private nonprofit</option>
+        <option value="Private for-profit">Private for-profit</option>
+      </select>
+    </div>
+    <div class="filter-tab">
+      <label for="f-tuition">Max out-of-state tuition</label>
+      <select id="f-tuition">
+        <option value="">Any</option>
+        <option value="15000">Under $15,000</option>
+        <option value="30000">Under $30,000</option>
+        <option value="50000">Under $50,000</option>
+        <option value="65000">Under $65,000</option>
+      </select>
+    </div>
+    <div class="filter-tab">
+      <label for="f-admit">Min admission rate</label>
+      <select id="f-admit">
+        <option value="">Any</option>
+        <option value="0.05">Above 5%</option>
+        <option value="0.2">Above 20%</option>
+        <option value="0.5">Above 50%</option>
+      </select>
+    </div>
+    <div class="filter-tab">
+      <label for="f-sort">Sort by</label>
+      <select id="f-sort">
+        <option value="name">Name (A–Z)</option>
+        <option value="tuition">Tuition (low–high)</option>
+        <option value="admitRate">Admission rate (low–high)</option>
+        <option value="earnings">Median earnings (high–low)</option>
+        <option value="gradRate">Grad rate (high–low)</option>
+      </select>
+    </div>
+  </div>
+</section>
+
+<main>
+  <p id="result-count" class="result-count"></p>
+  <div id="card-grid" class="card-grid" aria-live="polite"></div>
+  <p id="empty-state" class="empty-state" hidden>No schools match these filters. Try loosening one.</p>
+</main>
+
+<aside id="shortlist-drawer" class="shortlist-drawer" aria-hidden="true">
+  <div class="drawer-head">
+    <h2>Your shortlist</h2>
+    <button id="drawer-close" aria-label="Close shortlist">×</button>
+  </div>
+  <p class="drawer-hint">Cards you pull stay here — even after you close the tab.</p>
+  <ul id="shortlist-items" class="shortlist-items"></ul>
+  <div class="drawer-actions">
+    <button id="export-csv" class="stamp-button">⤓ Export as CSV</button>
+    <button id="clear-shortlist" class="text-button">Clear all</button>
+  </div>
+</aside>
+<div id="drawer-overlay" class="drawer-overlay" hidden></div>
+
+<footer class="site-footer">
+  <p>Data: <a href="https://collegescorecard.ed.gov/data/" target="_blank" rel="noopener">US Dept. of Education College Scorecard</a>, sample subset shown. Not affiliated with or endorsed by the Department of Education.</p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
