@@ -67,10 +67,10 @@ function topBachelorsPrograms(rawPrograms) {
   if (!Array.isArray(rawPrograms)) return [];
 
   return rawPrograms
-    .filter((p) => p && p["credential.level"] === BACHELORS_CREDENTIAL_LEVEL && p.title)
-    .sort((a, b) => (b["counts.ipeds_awards2"] ?? 0) - (a["counts.ipeds_awards2"] ?? 0))
+    .filter((p) => p && p.credential?.level === BACHELORS_CREDENTIAL_LEVEL && p.title)
+    .sort((a, b) => (b.counts?.ipeds_awards2 ?? 0) - (a.counts?.ipeds_awards2 ?? 0))
     .slice(0, TOP_PROGRAMS_PER_SCHOOL)
-    .map((p) => p.title);
+    .map((p) => p.title.replace(/\.$/, "")); // strip trailing period, e.g. "Animal Sciences."
 }
 
 function ownershipLabel(code) {
