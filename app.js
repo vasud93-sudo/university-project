@@ -170,12 +170,12 @@ function bareDomain(url) {
 // https://www.logo.dev/signup, then paste your token below.
 // Falls back to the initials badge if the image 404s, the token is
 // missing, or the school has no usable domain on file.
-const LOGO_DEV_TOKEN = "sk_DKstksTuSPOpqavw8IYimw"; // <-- paste your free logo.dev token here
+const LOGO_DEV_TOKEN = "pk_M41PnphQQySRY99z9ZQobw"; // <-- paste your free logo.dev token here
 
 function avatarHtml(s) {
   const initials = initialsFor(s.name);
   const domain = bareDomain(s.url);
-  if (!domain || LOGO_DEV_TOKEN === "sk_DKstksTuSPOpqavw8IYimw") {
+  if (!domain || LOGO_DEV_TOKEN === "pk_M41PnphQQySRY99z9ZQobw") {
     return `<div class="uni-card-avatar">${initials}</div>`;
   }
 
