@@ -1178,8 +1178,8 @@
     "actComposite50": 31,
     "actComposite75": 32,
     "edOffered": false,
-    "eaOffered": null,
-    "waitlistOffered": null,
+    "eaOffered": true,
+    "waitlistOffered": 8237,
     "sourceName": "school-published Common Data Set",
     "meritAid": null,
     "internationalEnrollmentPct": null
