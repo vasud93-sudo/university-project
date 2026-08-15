@@ -144,10 +144,8 @@ function render() {
   renderShortlist();
 }
 
-// Generates 1-2 letter initials for the logo-slot placeholder, skipping
-// common filler words so "University of Michigan-Ann Arbor" reads "UM"
-// rather than "Un". Swap the slot's contents for a real <img> later —
-// the sizing/positioning already accounts for that, see .uni-card-avatar.
+// Generates 1-2 letter initials, used as the fallback shown if a school's
+// real logo fails to load (missing domain, no logo on file, network error).
 const INITIALS_STOPWORDS = new Set(["university", "of", "the", "and", "at", "in", "for", "main", "campus"]);
 function initialsFor(name) {
   const words = name
@@ -157,12 +155,31 @@ function initialsFor(name) {
   return letters.join("") || name[0]?.toUpperCase() || "?";
 }
 
+// Strips protocol/www/path down to a bare domain, e.g.
+// "https://www.harvard.edu/admissions" -> "harvard.edu"
+function bareDomain(url) {
+  if (!url) return null;
+  return url.replace(/^https?:\/\//, "").replace(/^www\./, "").split("/")[0].trim() || null;
+}
+
+// Real logo via apistemic logos (free, no API key, domain-based lookup —
+// see https://logos.apistemic.com). Falls back to the initials badge if
+// the image 404s or the school has no usable domain on file.
+function avatarHtml(s) {
+  const initials = initialsFor(s.name);
+  const domain = bareDomain(s.url);
+  if (!domain) return `<div class="uni-card-avatar">${initials}</div>`;
+
+  const fallbackHtml = `<div class='uni-card-avatar'>${initials}</div>`.replace(/"/g, "&quot;");
+  return `<img class="uni-card-avatar" src="https://logos-api.apistemic.com/domain:${domain}" alt="" loading="lazy" data-fallback="${fallbackHtml}" onerror="this.replaceWith(document.createRange().createContextualFragment(this.dataset.fallback))" />`;
+}
+
 function cardHtml(s) {
   const pulled = shortlistIds.has(s.id);
   return `
     <article class="uni-card">
       <div class="uni-card-head">
-        <div class="uni-card-avatar" aria-hidden="true">${initialsFor(s.name)}</div>
+        ${avatarHtml(s)}
         <div class="uni-card-head-text">
           <span class="uni-card-tag">${s.ownership}</span>
           <h3 class="uni-card-name">${s.name}</h3>
