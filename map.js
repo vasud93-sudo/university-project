@@ -3,6 +3,16 @@ const STORAGE_KEY = "uni-catalog-shortlist";
 const fmtMoney = (n) => (n == null ? "—" : `$${Number(n).toLocaleString()}`);
 const fmtPct = (n) => (n == null ? "—" : `${Math.round(n * 100)}%`);
 
+function escapeHtml(str) {
+  if (str == null) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 async function init() {
   const shortlistIds = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"));
 
@@ -35,10 +45,10 @@ async function init() {
   const markers = shortlisted.map((s) => {
     const marker = L.marker([s.lat, s.lon]).addTo(map);
     marker.bindPopup(`
-      <div class="map-popup-name">${s.name}</div>
-      <div class="map-popup-meta">${s.city}, ${s.state}</div>
+      <div class="map-popup-name">${escapeHtml(s.name)}</div>
+      <div class="map-popup-meta">${escapeHtml(s.city)}, ${escapeHtml(s.state)}</div>
       <div class="map-popup-meta">Tuition: ${fmtMoney(s.tuitionOutOfState)} · Admit rate: ${fmtPct(s.admissionRate)}</div>
-      <a class="map-popup-link" href="school.html?id=${s.id}">View details &rarr;</a>
+      <a class="map-popup-link" href="school.html?id=${encodeURIComponent(s.id)}">View details &rarr;</a>
     `);
     return marker;
   });

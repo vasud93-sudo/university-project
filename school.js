@@ -88,6 +88,9 @@ function renderScorecard(s) {
         <span class="stat-value">${value}</span>
       </div>`)
     .join("");
+
+  document.getElementById("scorecard-caveat").textContent =
+    "Earnings figures are drawn from federal financial-aid records. International students generally aren't part of this underlying data, so this number may not reflect outcomes for someone in your situation. See our Methodology page for more.";
 }
 
 function renderAdmissionStrategy(cds) {
