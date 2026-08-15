@@ -20,14 +20,39 @@ const RAW_HEADERS = { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` };
 // Polite practice per their docs: identify this project in requests.
 const CLIENT_HEADER = { "X-CollegeData-Client": "us-university-catalog" };
 
-async function findSlug(schoolName) {
-  const url = `${API_BASE}/schools/search?q=${encodeURIComponent(schoolName)}`;
+// College Scorecard names often carry campus suffixes (e.g. "-Main Campus",
+// "-Ann Arbor") that don't match how CollegeData.FYI indexes school names,
+// silently breaking the search. This tries several increasingly-simplified
+// queries until one returns a result, instead of giving up after one try.
+function searchQueryCandidates(schoolName, domain) {
+  const candidates = [schoolName];
+
+  // Strip a trailing "-Something" campus/location qualifier.
+  const stripped = schoolName.replace(/-[^-]+$/, "").trim();
+  if (stripped && stripped !== schoolName) candidates.push(stripped);
+
+  // Domain is unambiguous and often indexed even when name text isn't.
+  if (domain) candidates.push(domain);
+
+  return [...new Set(candidates)];
+}
+
+async function trySearch(query) {
+  const url = `${API_BASE}/schools/search?q=${encodeURIComponent(query)}`;
   const res = await fetch(url, { headers: CLIENT_HEADER });
   if (!res.ok) return null;
   const data = await res.json();
   const results = data.results || data.schools || data;
   if (!Array.isArray(results) || results.length === 0) return null;
   return results[0].school_id || results[0].slug || results[0].id || null;
+}
+
+async function findSlug(schoolName, domain) {
+  for (const query of searchQueryCandidates(schoolName, domain)) {
+    const slug = await trySearch(query);
+    if (slug) return slug;
+  }
+  return null;
 }
 
 async function fetchFacts(slug) {
@@ -131,7 +156,7 @@ async function main() {
   for (let i = 0; i < schools.length; i++) {
     const school = schools[i];
     try {
-      const slug = await findSlug(school.name);
+      const slug = await findSlug(school.name, school.url);
       if (!slug) {
         cdsData[school.id] = { id: school.id, name: school.name, hasCdsData: false };
         console.log(`  ${i + 1}/${schools.length}: ${school.name} — no match found`);
