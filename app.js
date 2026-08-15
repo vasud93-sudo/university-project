@@ -1,6 +1,7 @@
 const STORAGE_KEY = "uni-catalog-shortlist";
 
 let schools = [];
+let cdsIds = new Set(); // ids of schools that have CDS data available
 let shortlistIds = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"));
 
 const els = {
@@ -10,6 +11,7 @@ const els = {
   ownership: document.getElementById("f-ownership"),
   tuition: document.getElementById("f-tuition"),
   admit: document.getElementById("f-admit"),
+  cds: document.getElementById("f-cds"),
   sort: document.getElementById("f-sort"),
   grid: document.getElementById("card-grid"),
   resultCount: document.getElementById("result-count"),
@@ -29,8 +31,16 @@ const fmtPct = (n) => (n == null ? "—" : `${Math.round(n * 100)}%`);
 const fmtInt = (n) => (n == null ? "—" : Number(n).toLocaleString());
 
 async function init() {
-  const res = await fetch("data/schools.json");
-  schools = await res.json();
+  const [schoolsRes, cds] = await Promise.all([
+    fetch("data/schools.json").then((r) => r.json()),
+    fetch("data/cds.json").then((r) => r.json()).catch(() => ({})),
+  ]);
+  schools = schoolsRes;
+  cdsIds = new Set(
+    Object.values(cds)
+      .filter((record) => record.hasCdsData)
+      .map((record) => record.id)
+  );
   populateStateFilter();
   populateMajorFilter();
   bindEvents();
@@ -59,7 +69,7 @@ function populateMajorFilter() {
 }
 
 function bindEvents() {
-  [els.search, els.state, els.major, els.ownership, els.tuition, els.admit, els.sort].forEach((el) =>
+  [els.search, els.state, els.major, els.ownership, els.tuition, els.admit, els.cds, els.sort].forEach((el) =>
     el.addEventListener("input", render)
   );
 
@@ -88,6 +98,7 @@ function getFiltered() {
   const ownership = els.ownership.value;
   const maxTuition = els.tuition.value ? Number(els.tuition.value) : null;
   const minAdmit = els.admit.value ? Number(els.admit.value) : null;
+  const cdsFilter = els.cds.value;
 
   let list = schools.filter((s) => {
     if (q && !`${s.name} ${s.city}`.toLowerCase().includes(q)) return false;
@@ -96,6 +107,8 @@ function getFiltered() {
     if (ownership && s.ownership !== ownership) return false;
     if (maxTuition != null && (s.tuitionOutOfState == null || s.tuitionOutOfState > maxTuition)) return false;
     if (minAdmit != null && (s.admissionRate == null || s.admissionRate < minAdmit)) return false;
+    if (cdsFilter === "yes" && !cdsIds.has(s.id)) return false;
+    if (cdsFilter === "no" && cdsIds.has(s.id)) return false;
     return true;
   });
 
@@ -152,6 +165,7 @@ function cardHtml(s) {
         <a class="uni-card-link" href="https://${s.url}" target="_blank" rel="noopener">${s.url || ""}</a>
         <div class="uni-card-actions">
           <a class="details-link" href="school.html?id=${s.id}">Details &rarr;</a>
+          ${cdsIds.has(s.id) ? '<span class="cds-indicator">CDS data</span>' : ""}
           <button class="pull-button ${pulled ? "pulled" : ""}" data-id="${s.id}">
             ${pulled ? "✓ On shortlist" : "+ Pull card"}
           </button>

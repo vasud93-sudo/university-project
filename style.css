@@ -309,6 +309,17 @@ main {
   white-space: nowrap;
 }
 
+.cds-indicator {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--stamp-red);
+  background: var(--paper);
+  border: 1px solid var(--stamp-red);
+  border-radius: 10px;
+  padding: 1px 7px;
+  white-space: nowrap;
+}
+
 .uni-card-link {
   font-family: var(--font-mono);
   font-size: 0.74rem;
