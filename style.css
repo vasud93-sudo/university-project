@@ -209,17 +209,17 @@ main {
 .uni-card-head {
   padding-right: 4px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 10px;
 }
 
 /* Fixed-size logo slot. Today it holds initials; later, swap the inner
    content for <img src="..." class="uni-card-avatar" /> — same class,
-   same 36x36 box, no layout changes needed elsewhere. */
+   same box, no layout changes needed elsewhere. */
 .uni-card-avatar {
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   background: var(--paper);
   border: 1px solid var(--brass);
@@ -228,7 +228,7 @@ main {
   justify-content: center;
   font-family: var(--font-mono);
   font-weight: 600;
-  font-size: 0.72rem;
+  font-size: 0.85rem;
   color: var(--library-green-dark);
   object-fit: contain;
 }
