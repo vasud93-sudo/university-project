@@ -144,14 +144,30 @@ function render() {
   renderShortlist();
 }
 
+// Generates 1-2 letter initials for the logo-slot placeholder, skipping
+// common filler words so "University of Michigan-Ann Arbor" reads "UM"
+// rather than "Un". Swap the slot's contents for a real <img> later —
+// the sizing/positioning already accounts for that, see .uni-card-avatar.
+const INITIALS_STOPWORDS = new Set(["university", "of", "the", "and", "at", "in", "for", "main", "campus"]);
+function initialsFor(name) {
+  const words = name
+    .split(/[\s-]+/)
+    .filter((w) => w && !INITIALS_STOPWORDS.has(w.toLowerCase()));
+  const letters = words.slice(0, 2).map((w) => w[0].toUpperCase());
+  return letters.join("") || name[0]?.toUpperCase() || "?";
+}
+
 function cardHtml(s) {
   const pulled = shortlistIds.has(s.id);
   return `
     <article class="uni-card">
       <div class="uni-card-head">
-        <span class="uni-card-tag">${s.ownership}</span>
-        <h3 class="uni-card-name">${s.name}</h3>
-        <span class="uni-card-loc">${s.city}, ${s.state}</span>
+        <div class="uni-card-avatar" aria-hidden="true">${initialsFor(s.name)}</div>
+        <div class="uni-card-head-text">
+          <span class="uni-card-tag">${s.ownership}</span>
+          <h3 class="uni-card-name">${s.name}</h3>
+          <span class="uni-card-loc">${s.city}, ${s.state}</span>
+        </div>
       </div>
       <div class="uni-card-stats">
         <div><span class="stat-label">Tuition (out-of-state)</span><span class="stat-value">${fmtMoney(s.tuitionOutOfState)}</span></div>
@@ -164,8 +180,10 @@ function cardHtml(s) {
       <div class="uni-card-foot">
         <a class="uni-card-link" href="https://${s.url}" target="_blank" rel="noopener">${s.url || ""}</a>
         <div class="uni-card-actions">
-          <a class="details-link" href="school.html?id=${s.id}">Details &rarr;</a>
-          ${cdsIds.has(s.id) ? '<span class="cds-indicator">CDS data</span>' : ""}
+          <div class="uni-card-actions-left">
+            <a class="details-link" href="school.html?id=${s.id}">Details &rarr;</a>
+            ${cdsIds.has(s.id) ? '<span class="cds-indicator">CDS data</span>' : ""}
+          </div>
           <button class="pull-button ${pulled ? "pulled" : ""}" data-id="${s.id}">
             ${pulled ? "✓ On shortlist" : "+ Pull card"}
           </button>

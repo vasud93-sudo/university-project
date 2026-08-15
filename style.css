@@ -206,7 +206,37 @@ main {
   border: 1px solid var(--brass);
 }
 
-.uni-card-head { padding-right: 4px; }
+.uni-card-head {
+  padding-right: 4px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+/* Fixed-size logo slot. Today it holds initials; later, swap the inner
+   content for <img src="..." class="uni-card-avatar" /> — same class,
+   same 36x36 box, no layout changes needed elsewhere. */
+.uni-card-avatar {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 1px solid var(--brass);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.72rem;
+  color: var(--library-green-dark);
+  object-fit: contain;
+}
+
+.uni-card-head-text {
+  min-width: 0;
+  flex: 1;
+}
 
 .uni-card-name {
   font-family: var(--font-display);
@@ -288,8 +318,7 @@ main {
 .uni-card-foot {
   margin-top: auto;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
   gap: 8px;
   padding-top: 6px;
 }
@@ -297,7 +326,15 @@ main {
 .uni-card-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.uni-card-actions-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
 }
 
 .details-link {
@@ -307,6 +344,7 @@ main {
   text-decoration: none;
   border-bottom: 1px solid var(--library-green-dark);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .cds-indicator {
@@ -318,6 +356,7 @@ main {
   border-radius: 10px;
   padding: 1px 7px;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .uni-card-link {
@@ -325,6 +364,11 @@ main {
   font-size: 0.74rem;
   text-decoration: none;
   border-bottom: 1px solid currentColor;
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .pull-button {
@@ -340,6 +384,7 @@ main {
   padding: 6px 10px;
   cursor: pointer;
   white-space: nowrap;
+  flex-shrink: 0;
   transition: background 0.12s ease, color 0.12s ease;
 }
 .pull-button:hover { background: var(--stamp-red); color: white; }
