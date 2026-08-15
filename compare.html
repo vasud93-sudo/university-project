@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Compare — US University Catalog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="masthead-title">
+      <a href="index.html" class="back-link">&larr; Back to catalog</a>
+      <h1>Compare</h1>
+      <p class="tagline" id="compare-subtitle">Your shortlisted schools, side by side.</p>
+    </div>
+  </div>
+</header>
+
+<main class="compare-main">
+  <div id="compare-empty" class="empty-state" hidden>
+    Your shortlist is empty, so there's nothing to compare yet.
+    <br /><a href="index.html" class="details-link">Go pull a few cards &rarr;</a>
+  </div>
+  <div id="compare-table-wrap" class="compare-table-wrap">
+    <table id="compare-table" class="compare-table"></table>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <p><a href="index.html">&larr; Back to catalog</a> &middot; <a href="methodology.html">Methodology &amp; data limitations</a></p>
+</footer>
+
+<script src="shared.js"></script>
+<script src="compare.js"></script>
+</body>
+</html>

@@ -85,8 +85,16 @@
         <option value="admitRate">Admission rate (low–high)</option>
         <option value="earnings">Median earnings (high–low)</option>
         <option value="gradRate">Grad rate (high–low)</option>
+        <option value="priority">My priorities (set below) &#9660;</option>
       </select>
     </div>
+  </div>
+</section>
+
+<section id="priority-panel" class="priority-panel" hidden>
+  <div class="priority-panel-inner">
+    <p class="priority-hint">Set how much each factor matters to you (0 = ignore it, 10 = matters most). The grid re-sorts live as you adjust.</p>
+    <div class="priority-sliders" id="priority-sliders"></div>
   </div>
 </section>
 
@@ -105,6 +113,7 @@
   <ul id="shortlist-items" class="shortlist-items"></ul>
   <div class="drawer-actions">
     <a id="view-map" href="map.html" class="stamp-button map-button">&#128506; View on map</a>
+    <a id="view-compare" href="compare.html" class="stamp-button compare-button">&#9776; Compare side by side</a>
     <button id="export-csv" class="stamp-button">⤓ Export as CSV</button>
     <button id="clear-shortlist" class="text-button">Clear all</button>
   </div>
@@ -116,6 +125,7 @@
   <p><a href="methodology.html">Methodology &amp; data limitations</a></p>
 </footer>
 
+<script src="shared.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

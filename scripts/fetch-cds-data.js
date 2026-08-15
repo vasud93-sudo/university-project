@@ -121,27 +121,57 @@ function normalize(schoolId, schoolName, facts, meritAid, international) {
   const satMath25 = factValue(facts, "ipeds.sat_math_p25");
   const satMath75 = factValue(facts, "ipeds.sat_math_p75");
 
+  const satComposite50 = factValue(facts, "sat_composite_p50");
+  const satComposite25 = satEbrw25 != null && satMath25 != null ? satEbrw25 + satMath25 : null;
+  const satComposite75 = satEbrw75 != null && satMath75 != null ? satEbrw75 + satMath75 : null;
+  const actComposite25 = factValue(facts, "ipeds.act_composite_p25");
+  const actComposite50 = factValue(facts, "ipeds.act_composite_p50") ?? factValue(facts, "act_composite_p50");
+  const actComposite75 = factValue(facts, "ipeds.act_composite_p75");
+  const edOffered = factValue(facts, "ed_offered");
+  const eaOffered = factValue(facts, "ea_offered");
+  const waitlistOffered = factValue(facts, "wait_list_offered");
+  const meritAidResult = meritAid && meritAid.first_year_ft_students
+    ? {
+        recipientShare: meritAid.non_need_aid_share_first_year_ft,
+        avgAward: meritAid.avg_non_need_grant_first_year_ft,
+      }
+    : null;
+  const internationalEnrollmentPct = international ? international.value : null;
+  // A link to the actual archived CDS document, when CollegeData.FYI
+  // provides one — this is their own recorded source, not a guessed URL.
+  const cdsDocumentUrl = facts.sources?.find((s) => s.kind === "cds_document")?.archive_url || null;
+
+  // A response can technically succeed (200 OK) even when the school has
+  // no real CDS document behind it — CollegeData.FYI may still return a
+  // profile shell with every field empty. Only count a school as "has CDS
+  // data" if at least one substantive field actually has a value; this
+  // keeps the site's coverage numbers honest rather than overcounting.
+  const hasCdsData = [
+    satComposite50, satComposite25, actComposite25, actComposite50,
+    edOffered, eaOffered, waitlistOffered, meritAidResult, internationalEnrollmentPct,
+  ].some((v) => v != null);
+
+  if (!hasCdsData) {
+    return { id: schoolId, name: schoolName, hasCdsData: false };
+  }
+
   return {
     id: schoolId,
     name: schoolName,
     hasCdsData: true,
-    satComposite50: factValue(facts, "sat_composite_p50"),
-    satComposite25: satEbrw25 != null && satMath25 != null ? satEbrw25 + satMath25 : null,
-    satComposite75: satEbrw75 != null && satMath75 != null ? satEbrw75 + satMath75 : null,
-    actComposite25: factValue(facts, "ipeds.act_composite_p25"),
-    actComposite50: factValue(facts, "ipeds.act_composite_p50") ?? factValue(facts, "act_composite_p50"),
-    actComposite75: factValue(facts, "ipeds.act_composite_p75"),
-    edOffered: factValue(facts, "ed_offered"),
-    eaOffered: factValue(facts, "ea_offered"),
-    waitlistOffered: factValue(facts, "wait_list_offered"),
+    satComposite50,
+    satComposite25,
+    satComposite75,
+    actComposite25,
+    actComposite50,
+    actComposite75,
+    edOffered,
+    eaOffered,
+    waitlistOffered,
     sourceName: "school-published Common Data Set",
-    meritAid: meritAid && meritAid.first_year_ft_students
-      ? {
-          recipientShare: meritAid.non_need_aid_share_first_year_ft,
-          avgAward: meritAid.avg_non_need_grant_first_year_ft,
-        }
-      : null,
-    internationalEnrollmentPct: international ? international.value : null,
+    cdsDocumentUrl,
+    meritAid: meritAidResult,
+    internationalEnrollmentPct,
   };
 }
 

@@ -2,6 +2,7 @@ const STORAGE_KEY = "uni-catalog-shortlist";
 
 let schools = [];
 let cdsIds = new Set(); // ids of schools that have CDS data available
+let cdsData = {}; // full CDS records, keyed by school id — used for priority scoring
 let shortlistIds = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"));
 
 const els = {
@@ -13,6 +14,8 @@ const els = {
   admit: document.getElementById("f-admit"),
   cds: document.getElementById("f-cds"),
   sort: document.getElementById("f-sort"),
+  priorityPanel: document.getElementById("priority-panel"),
+  prioritySliders: document.getElementById("priority-sliders"),
   grid: document.getElementById("card-grid"),
   resultCount: document.getElementById("result-count"),
   emptyState: document.getElementById("empty-state"),
@@ -26,19 +29,9 @@ const els = {
   clearBtn: document.getElementById("clear-shortlist"),
 };
 
-// Escapes HTML-significant characters before interpolating any data-sourced
-// string into markup. The data here comes from a trusted federal API today,
-// but this is cheap insurance against XSS if a less-trusted source (user
-// submissions, a scraped feed, etc.) ever gets added later.
-function escapeHtml(str) {
-  if (str == null) return "";
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
+// escapeHtml, initialsFor, bareDomain, avatarHtml, and LOGO_DEV_TOKEN now
+// live in shared.js (loaded before this file) so the grid and detail pages
+// share one copy instead of duplicating logo/token logic.
 
 const fmtMoney = (n) => (n == null ? "—" : `$${Number(n).toLocaleString()}`);
 const fmtPct = (n) => (n == null ? "—" : `${Math.round(n * 100)}%`);
@@ -50,6 +43,7 @@ async function init() {
     fetch("data/cds.json").then((r) => r.json()).catch(() => ({})),
   ]);
   schools = schoolsRes;
+  cdsData = cds;
   cdsIds = new Set(
     Object.values(cds)
       .filter((record) => record.hasCdsData)
@@ -73,7 +67,7 @@ function populateStateFilter() {
 }
 
 function populateMajorFilter() {
-  const majors = [...new Set(schools.flatMap((s) => s.topPrograms || []))].sort();
+  const majors = [...new Set(schools.flatMap((s) => (s.topPrograms || []).map((p) => p.title)))].sort();
   for (const major of majors) {
     const opt = document.createElement("option");
     opt.value = major;
@@ -82,9 +76,52 @@ function populateMajorFilter() {
   }
 }
 
+// Priority weighting for the "My priorities" sort mode. Each factor's
+// score() returns a raw value that gets min-max normalized (0-1) across
+// the currently filtered list before combining, and higher normalized
+// score always means "better match for this priority" — direction is
+// baked in here so the slider UI only needs one number per factor.
+const PRIORITY_FACTORS = [
+  { key: "affordability", label: "Affordability (lower cost)", score: (s) => (s.tuitionOutOfState != null ? -s.tuitionOutOfState : null) },
+  { key: "outcomes", label: "Graduate earnings", score: (s) => s.medianEarnings10yr },
+  { key: "admitChance", label: "Admission chances (less selective)", score: (s) => s.admissionRate },
+  { key: "international", label: "International student community", score: (s) => cdsData[s.id]?.internationalEnrollmentPct ?? null },
+  { key: "stemOpt", label: "STEM OPT-eligible majors offered", score: (s) => (s.topPrograms || []).filter((p) => p.coreStem).length },
+];
+
+function renderPrioritySliders() {
+  els.prioritySliders.innerHTML = PRIORITY_FACTORS.map(
+    (f) => `
+    <div class="priority-slider-row">
+      <label for="priority-${f.key}">${f.label}</label>
+      <input type="range" id="priority-${f.key}" min="0" max="10" value="5" data-factor="${f.key}" />
+      <span class="priority-slider-value" id="priority-${f.key}-out">5</span>
+    </div>`
+  ).join("");
+
+  els.prioritySliders.querySelectorAll("input[type=range]").forEach((input) => {
+    input.addEventListener("input", () => {
+      document.getElementById(`priority-${input.dataset.factor}-out`).textContent = input.value;
+      render();
+    });
+  });
+}
+
+function getPriorityWeights() {
+  const weights = {};
+  PRIORITY_FACTORS.forEach((f) => {
+    const el = document.getElementById(`priority-${f.key}`);
+    weights[f.key] = el ? Number(el.value) : 5;
+  });
+  return weights;
+}
+
 function bindEvents() {
   [els.search, els.state, els.major, els.ownership, els.tuition, els.admit, els.cds, els.sort].forEach((el) =>
-    el.addEventListener("input", render)
+    el.addEventListener("input", () => {
+      els.priorityPanel.hidden = els.sort.value !== "priority";
+      render();
+    })
   );
 
   els.drawerToggle.addEventListener("click", () => setDrawer(true));
@@ -96,6 +133,8 @@ function bindEvents() {
     saveShortlist();
     render();
   });
+
+  renderPrioritySliders();
 }
 
 function setDrawer(open) {
@@ -117,7 +156,7 @@ function getFiltered() {
   let list = schools.filter((s) => {
     if (q && !`${s.name} ${s.city}`.toLowerCase().includes(q)) return false;
     if (state && s.state !== state) return false;
-    if (major && !(s.topPrograms || []).includes(major)) return false;
+    if (major && !(s.topPrograms || []).some((p) => p.title === major)) return false;
     if (ownership && s.ownership !== ownership) return false;
     if (maxTuition != null && (s.tuitionOutOfState == null || s.tuitionOutOfState > maxTuition)) return false;
     if (minAdmit != null && (s.admissionRate == null || s.admissionRate < minAdmit)) return false;
@@ -127,6 +166,11 @@ function getFiltered() {
   });
 
   const sortKey = els.sort.value;
+
+  if (sortKey === "priority") {
+    return sortByPriority(list);
+  }
+
   list.sort((a, b) => {
     switch (sortKey) {
       case "tuition":
@@ -145,6 +189,39 @@ function getFiltered() {
   return list;
 }
 
+// Min-max normalizes each priority factor across the currently filtered
+// list (not the whole dataset), so scores stay meaningful even as filters
+// narrow the pool. Schools missing a factor's data get 0 for that factor
+// rather than being excluded — a real limitation (see Methodology), but
+// better than silently dropping schools with incomplete CDS data.
+function sortByPriority(list) {
+  const weights = getPriorityWeights();
+  const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0);
+  if (totalWeight === 0) return list.sort((a, b) => a.name.localeCompare(b.name));
+
+  const ranges = {};
+  PRIORITY_FACTORS.forEach((f) => {
+    const values = list.map((s) => f.score(s)).filter((v) => v != null);
+    ranges[f.key] = { min: Math.min(...values, 0), max: Math.max(...values, 1) };
+  });
+
+  function compositeScore(s) {
+    let total = 0;
+    PRIORITY_FACTORS.forEach((f) => {
+      const raw = f.score(s);
+      const { min, max } = ranges[f.key];
+      const normalized = raw == null || max === min ? 0 : (raw - min) / (max - min);
+      total += weights[f.key] * normalized;
+    });
+    return total / totalWeight;
+  }
+
+  return list
+    .map((s) => ({ s, score: compositeScore(s) }))
+    .sort((a, b) => b.score - a.score)
+    .map((x) => x.s);
+}
+
 function render() {
   const list = getFiltered();
   els.resultCount.textContent = `${list.length} school${list.length === 1 ? "" : "s"} on file`;
@@ -158,51 +235,12 @@ function render() {
   renderShortlist();
 }
 
-// Generates 1-2 letter initials, used as the fallback shown if a school's
-// real logo fails to load (missing domain, no logo on file, network error).
-const INITIALS_STOPWORDS = new Set(["university", "of", "the", "and", "at", "in", "for", "main", "campus"]);
-function initialsFor(name) {
-  const words = name
-    .split(/[\s-]+/)
-    .filter((w) => w && !INITIALS_STOPWORDS.has(w.toLowerCase()));
-  const letters = words.slice(0, 2).map((w) => w[0].toUpperCase());
-  return letters.join("") || name[0]?.toUpperCase() || "?";
-}
-
-// Strips protocol/www/path down to a bare domain, e.g.
-// "https://www.harvard.edu/admissions" -> "harvard.edu"
-function bareDomain(url) {
-  if (!url) return null;
-  return url.replace(/^https?:\/\//, "").replace(/^www\./, "").split("/")[0].trim() || null;
-}
-
-// Real logo via logo.dev, which maintains genuine coverage for US
-// universities (confirmed: Harvard, MIT, Stanford, and 90+ others in
-// their college-logos set) — unlike some general-purpose logo APIs,
-// which are built for tech/SaaS company domains and don't reliably
-// cover .edu domains. Requires a free API token: sign up at
-// https://www.logo.dev/signup, then paste your token below.
-// Falls back to the initials badge if the image 404s, the token is
-// missing, or the school has no usable domain on file.
-const LOGO_DEV_TOKEN = "pk_M41PnphQQySRY99z9ZQobw"; // <-- paste your free logo.dev token here
-
-function avatarHtml(s) {
-  const initials = initialsFor(s.name);
-  const domain = bareDomain(s.url);
-  if (!domain || !LOGO_DEV_TOKEN) {
-    return `<div class="uni-card-avatar">${escapeHtml(initials)}</div>`;
-  }
-
-  const fallbackHtml = `<div class='uni-card-avatar'>${escapeHtml(initials)}</div>`.replace(/"/g, "&quot;");
-  return `<img class="uni-card-avatar" src="https://img.logo.dev/${encodeURIComponent(domain)}?token=${encodeURIComponent(LOGO_DEV_TOKEN)}&size=92&format=webp" alt="" data-fallback="${fallbackHtml}" onerror="this.replaceWith(document.createRange().createContextualFragment(this.dataset.fallback))" />`;
-}
-
 function cardHtml(s) {
   const pulled = shortlistIds.has(s.id);
   return `
     <article class="uni-card">
       <div class="uni-card-head">
-        ${avatarHtml(s)}
+        ${avatarHtml(s, "uni-card-avatar")}
         <div class="uni-card-head-text">
           <span class="uni-card-tag">${escapeHtml(s.ownership)}</span>
           <h3 class="uni-card-name">${escapeHtml(s.name)}</h3>
@@ -237,7 +275,12 @@ function programsHtml(topPrograms) {
   if (!topPrograms || topPrograms.length === 0) return "";
   const shown = topPrograms.slice(0, 4);
   const remaining = topPrograms.length - shown.length;
-  const chips = shown.map((p) => `<span class="major-chip">${escapeHtml(p)}</span>`).join("");
+  const chips = shown
+    .map(
+      (p) =>
+        `<span class="major-chip${p.coreStem ? " major-chip-stem" : ""}">${escapeHtml(p.title)}${p.coreStem ? ' <span class="stem-badge" title="STEM OPT eligible — core CIP family (Engineering, Biological Sciences, Math/Statistics, or Physical Sciences)">STEM</span>' : ""}</span>`
+    )
+    .join("");
   const more = remaining > 0 ? `<span class="major-chip major-chip-more">+${remaining} more</span>` : "";
   return `
     <div class="uni-card-majors">
@@ -291,7 +334,7 @@ function exportCsv() {
     s.name, s.city, s.state, s.ownership,
     s.tuitionInState ?? "", s.tuitionOutOfState ?? "",
     s.admissionRate ?? "", s.enrollment ?? "", s.gradRate4yr ?? "",
-    s.medianEarnings10yr ?? "", (s.topPrograms || []).join("; "), s.url ?? "",
+    s.medianEarnings10yr ?? "", (s.topPrograms || []).map((p) => p.title + (p.coreStem ? " (STEM OPT eligible)" : "")).join("; "), s.url ?? "",
   ]);
   const csv = [headers, ...rows]
     .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))

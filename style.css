@@ -154,6 +154,57 @@ a { color: var(--library-green); }
 
 /* ---------- Main / results ---------- */
 
+.priority-panel {
+  background: var(--card);
+  border-bottom: 1px solid var(--brass);
+}
+
+.priority-panel-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 24px;
+}
+
+.priority-hint {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--ink-soft);
+  margin: 0 0 14px;
+}
+
+.priority-sliders {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px 24px;
+}
+
+.priority-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.priority-slider-row label {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: var(--ink);
+  flex: 1;
+}
+
+.priority-slider-row input[type="range"] {
+  flex: 1;
+  max-width: 140px;
+  accent-color: var(--stamp-red);
+}
+
+.priority-slider-value {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--library-green-dark);
+  min-width: 1.5ch;
+  text-align: right;
+}
+
 main {
   max-width: 1200px;
   margin: 0 auto;
@@ -307,6 +358,22 @@ main {
   color: var(--ink-soft);
   border-radius: 12px;
   padding: 3px 9px;
+}
+
+.major-chip-stem {
+  border-color: var(--library-green-dark);
+}
+
+.stem-badge {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: white;
+  background: var(--library-green-dark);
+  border-radius: 8px;
+  padding: 1px 5px;
+  margin-left: 3px;
+  letter-spacing: 0.02em;
 }
 
 .major-chip-more {
@@ -504,6 +571,93 @@ main {
   background: var(--library-green);
 }
 
+.compare-button {
+  background: var(--brass);
+}
+
+/* ---------- Compare page ---------- */
+
+.compare-main {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 24px;
+}
+
+.empty-state {
+  font-family: var(--font-mono);
+  color: var(--ink-soft);
+  text-align: center;
+  padding: 60px 24px;
+}
+
+.compare-table-wrap {
+  overflow-x: auto;
+}
+
+.compare-table {
+  border-collapse: collapse;
+  min-width: 100%;
+}
+
+.compare-table td, .compare-table th {
+  border: 1px solid var(--brass);
+  padding: 10px 16px;
+  text-align: left;
+  vertical-align: top;
+  font-size: 0.86rem;
+}
+
+.compare-table thead th {
+  background: var(--library-green);
+  height: 4px;
+}
+
+.compare-table tbody tr:nth-child(1) td {
+  background: var(--card);
+}
+
+.compare-row-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  background: var(--paper);
+  white-space: nowrap;
+  min-width: 160px;
+}
+
+.compare-table td:not(.compare-row-label) {
+  min-width: 200px;
+  font-family: var(--font-mono);
+}
+
+.compare-avatar-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.compare-avatar {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 1px solid var(--brass);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.68rem;
+  color: var(--library-green-dark);
+  object-fit: cover;
+}
+
 .text-button {
   background: none;
   border: none;
@@ -532,6 +686,35 @@ main {
   text-decoration: none;
   border-bottom: 1px solid var(--paper);
   margin-bottom: 10px;
+}
+
+.masthead-identity {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.masthead-identity-text {
+  min-width: 0;
+}
+
+/* Larger sibling of .uni-card-avatar for the detail-page header — same
+   fallback/logo pattern from shared.js, just sized up. */
+.school-avatar {
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 2px solid var(--brass-line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--library-green-dark);
+  object-fit: cover;
 }
 
 .detail-main {

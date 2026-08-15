@@ -34,6 +34,7 @@ const FIELDS = [
   // all_programs_nested=true (added below) returns every program, not just
   // ones matching a filter — we need the full list to rank them ourselves.
   "latest.programs.cip_4_digit.title",
+  "latest.programs.cip_4_digit.code",
   "latest.programs.cip_4_digit.credential.level",
   "latest.programs.cip_4_digit.counts.ipeds_awards2",
 ].join(",");
@@ -61,6 +62,22 @@ async function fetchPage(page) {
   return res.json();
 }
 
+// The four CIP 2-digit families DHS designates as core STEM by law, no
+// exceptions — 8 CFR 214.2(f)(10)(ii)(C)(2). Any major whose CIP code
+// starts with one of these prefixes is reliably STEM OPT eligible.
+// DHS also approves specific individual majors from 18 OTHER subject
+// areas (e.g. Computer Science under CIP 11) — but only at the exact
+// 6-digit code level, not the whole family. We deliberately don't try to
+// replicate that longer, more error-prone list here: getting a visa-
+// consequential classification wrong is worse than saying "check the
+// official list" for anything outside the four reliable core families.
+const CORE_STEM_CIP_PREFIXES = ["14", "26", "27", "40"];
+function isCoreStem(cipCode) {
+  if (!cipCode) return false;
+  const prefix = String(cipCode).split(".")[0].padStart(2, "0");
+  return CORE_STEM_CIP_PREFIXES.includes(prefix);
+}
+
 // Picks the school's top N bachelor's-level majors by number of graduates.
 // If the nested program data comes back empty or in an unexpected shape,
 // this safely returns [] instead of crashing the whole fetch — see the
@@ -72,7 +89,11 @@ function topBachelorsPrograms(rawPrograms) {
     .filter((p) => p && p.credential?.level === BACHELORS_CREDENTIAL_LEVEL && p.title)
     .sort((a, b) => (b.counts?.ipeds_awards2 ?? 0) - (a.counts?.ipeds_awards2 ?? 0))
     .slice(0, TOP_PROGRAMS_PER_SCHOOL)
-    .map((p) => p.title.replace(/\.$/, "")); // strip trailing period, e.g. "Animal Sciences."
+    .map((p) => ({
+      title: p.title.replace(/\.$/, ""), // strip trailing period, e.g. "Animal Sciences."
+      cipCode: p.code ?? null,
+      coreStem: isCoreStem(p.code),
+    }));
 }
 
 function ownershipLabel(code) {

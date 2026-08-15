@@ -71,6 +71,7 @@ function renderHeader(s) {
   document.title = `${s.name} — US University Catalog`;
   document.getElementById("school-name").textContent = s.name;
   document.getElementById("school-loc").textContent = `${s.city}, ${s.state} · ${s.ownership}`;
+  document.getElementById("school-avatar-slot").innerHTML = avatarHtml(s, "school-avatar");
 }
 
 function renderScorecard(s) {
@@ -112,7 +113,10 @@ function renderAdmissionStrategy(cds) {
     .join("");
 
   const sourceEl = document.getElementById("admission-source");
-  sourceEl.textContent = `Source: ${cds.sourceName || "school-published Common Data Set"}`;
+  const sourceLabel = `Source: ${cds.sourceName || "school-published Common Data Set"}`;
+  sourceEl.innerHTML = cds.cdsDocumentUrl
+    ? `${escapeHtml(sourceLabel)} — <a href="${encodeURI(cds.cdsDocumentUrl)}" target="_blank" rel="noopener">view original document</a>`
+    : escapeHtml(sourceLabel);
 
   section.hidden = false;
 }
