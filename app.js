@@ -175,7 +175,7 @@ const LOGO_DEV_TOKEN = "pk_M41PnphQQySRY99z9ZQobw"; // <-- paste your free logo.
 function avatarHtml(s) {
   const initials = initialsFor(s.name);
   const domain = bareDomain(s.url);
-  if (!domain || LOGO_DEV_TOKEN === "pk_M41PnphQQySRY99z9ZQobw") {
+  if (!domain || !LOGO_DEV_TOKEN) {
     return `<div class="uni-card-avatar">${initials}</div>`;
   }
 
