@@ -98,6 +98,24 @@ Coverage is partial — only schools with a publicly archived CDS will show
 these sections; others get a plain "not available" note instead of missing
 or broken UI.
 
+### For international applicants
+
+Also on each school's detail page, when available:
+- **International student enrollment share** — the federal "nonresident
+  alien" category, pulled from IPEDS via CollegeData.FYI
+- **Merit aid stats** — % of first-year students getting non-need-based
+  (merit) aid, and the average award. This matters especially for
+  international applicants, since need-based federal aid generally
+  requires US citizenship or eligible noncitizen status — merit aid is
+  often the main aid pathway actually open to an international student.
+
+Not covered by any available data source: TOEFL/IELTS score requirements,
+international-specific scholarships, or need-blind/need-aware admission
+policy for international applicants. These aren't part of CDS or IPEDS's
+structured data — they exist only as free text on each school's own
+international-admissions webpage, so pulling them at scale isn't
+automatable with what's available here.
+
 
 Each school now lists its top 10 bachelor's-level majors, ranked by number of
 graduates (the biggest, most established programs — not just anything

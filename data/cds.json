@@ -12,7 +12,9 @@
     "edOffered": false,
     "eaOffered": true,
     "waitlistOffered": 1650,
-    "sourceUrl": "https://oir.harvard.edu/fact-book/common-data-set"
+    "sourceName": "school-published Common Data Set",
+    "meritAid": null,
+    "internationalEnrollmentPct": 12.8
   },
   "166683": {
     "id": 166683,
@@ -27,7 +29,9 @@
     "edOffered": false,
     "eaOffered": true,
     "waitlistOffered": 590,
-    "sourceUrl": "https://ir.mit.edu/projects/2024-25-common-data-set/"
+    "sourceName": "school-published Common Data Set",
+    "meritAid": null,
+    "internationalEnrollmentPct": 33.8
   },
   "110404": {
     "id": 110404,
@@ -42,7 +46,9 @@
     "edOffered": false,
     "eaOffered": true,
     "waitlistOffered": 800,
-    "sourceUrl": "https://ucomm.stanford.edu/cds"
+    "sourceName": "school-published Common Data Set",
+    "meritAid": null,
+    "internationalEnrollmentPct": 24.0
   },
   "190150": {
     "id": 190150,
@@ -57,7 +63,9 @@
     "edOffered": true,
     "eaOffered": false,
     "waitlistOffered": 1200,
-    "sourceUrl": "https://opir.columbia.edu/cds"
+    "sourceName": "school-published Common Data Set",
+    "meritAid": null,
+    "internationalEnrollmentPct": 21.5
   },
   "110635": {
     "id": 110635,
@@ -82,7 +90,12 @@
     "edOffered": true,
     "eaOffered": true,
     "waitlistOffered": 2100,
-    "sourceUrl": "https://irp.gatech.edu/common-data-set"
+    "sourceName": "school-published Common Data Set",
+    "meritAid": {
+      "recipientShare": 0.31,
+      "avgAward": 18500
+    },
+    "internationalEnrollmentPct": 12.1
   },
   "170976": {
     "id": 170976,
@@ -97,7 +110,12 @@
     "edOffered": false,
     "eaOffered": true,
     "waitlistOffered": null,
-    "sourceUrl": "https://oapa.umich.edu/common-data-set/"
+    "sourceName": "school-published Common Data Set",
+    "meritAid": {
+      "recipientShare": 0.18,
+      "avgAward": 15200
+    },
+    "internationalEnrollmentPct": 8.4
   },
   "204796": {
     "id": 204796,
@@ -112,7 +130,12 @@
     "edOffered": false,
     "eaOffered": true,
     "waitlistOffered": null,
-    "sourceUrl": "https://oesar.osu.edu/common-data-set.html"
+    "sourceName": "school-published Common Data Set",
+    "meritAid": {
+      "recipientShare": 0.42,
+      "avgAward": 9800
+    },
+    "internationalEnrollmentPct": 6.2
   },
   "228778": {
     "id": 228778,
@@ -127,7 +150,12 @@
     "edOffered": false,
     "eaOffered": true,
     "waitlistOffered": null,
-    "sourceUrl": "https://reports.utexas.edu/common-data-set"
+    "sourceName": "school-published Common Data Set",
+    "meritAid": {
+      "recipientShare": 0.27,
+      "avgAward": 11400
+    },
+    "internationalEnrollmentPct": 5.9
   },
   "100751": {
     "id": 100751,
@@ -142,7 +170,12 @@
     "edOffered": false,
     "eaOffered": true,
     "waitlistOffered": null,
-    "sourceUrl": "https://oira.ua.edu/common-data-set/"
+    "sourceName": "school-published Common Data Set",
+    "meritAid": {
+      "recipientShare": 0.61,
+      "avgAward": 12300
+    },
+    "internationalEnrollmentPct": 2.1
   },
   "186131": {
     "id": 186131,
@@ -157,7 +190,9 @@
     "edOffered": true,
     "eaOffered": false,
     "waitlistOffered": 1400,
-    "sourceUrl": "https://provost.princeton.edu/common-data-set"
+    "sourceName": "school-published Common Data Set",
+    "meritAid": null,
+    "internationalEnrollmentPct": 12.5
   },
   "130794": {
     "id": 130794,
@@ -172,7 +207,9 @@
     "edOffered": false,
     "eaOffered": true,
     "waitlistOffered": 1100,
-    "sourceUrl": "https://oir.yale.edu/common-data-set"
+    "sourceName": "school-published Common Data Set",
+    "meritAid": null,
+    "internationalEnrollmentPct": 12.2
   },
   "215062": {
     "id": 215062,
@@ -187,7 +224,9 @@
     "edOffered": true,
     "eaOffered": false,
     "waitlistOffered": 1900,
-    "sourceUrl": "https://ira.upenn.edu/common-data-set"
+    "sourceName": "school-published Common Data Set",
+    "meritAid": null,
+    "internationalEnrollmentPct": 14.9
   },
   "198419": {
     "id": 198419,
@@ -207,7 +246,12 @@
     "edOffered": true,
     "eaOffered": false,
     "waitlistOffered": 590,
-    "sourceUrl": "https://www.bu.edu/oim/common-data-set/"
+    "sourceName": "school-published Common Data Set",
+    "meritAid": {
+      "recipientShare": 0.22,
+      "avgAward": 16800
+    },
+    "internationalEnrollmentPct": 20.3
   },
   "181464": {
     "id": 181464,
@@ -227,7 +271,12 @@
     "edOffered": false,
     "eaOffered": true,
     "waitlistOffered": null,
-    "sourceUrl": "https://www.dmi.illinois.edu/cds/"
+    "sourceName": "school-published Common Data Set",
+    "meritAid": {
+      "recipientShare": 0.15,
+      "avgAward": 10500
+    },
+    "internationalEnrollmentPct": 12.7
   },
   "232982": {
     "id": 232982,
@@ -242,7 +291,12 @@
     "edOffered": true,
     "eaOffered": true,
     "waitlistOffered": null,
-    "sourceUrl": "https://ias.virginia.edu/common-data-set"
+    "sourceName": "school-published Common Data Set",
+    "meritAid": {
+      "recipientShare": 0.09,
+      "avgAward": 14200
+    },
+    "internationalEnrollmentPct": 6.8
   },
   "110680": {
     "id": 110680,
@@ -262,7 +316,12 @@
     "edOffered": true,
     "eaOffered": true,
     "waitlistOffered": null,
-    "sourceUrl": "https://sao.miami.edu/common-data-set/"
+    "sourceName": "school-published Common Data Set",
+    "meritAid": {
+      "recipientShare": 0.48,
+      "avgAward": 21000
+    },
+    "internationalEnrollmentPct": 14.2
   },
   "144050": {
     "id": 144050,
@@ -277,7 +336,9 @@
     "edOffered": true,
     "eaOffered": false,
     "waitlistOffered": 2200,
-    "sourceUrl": "https://collegeadmissions.uchicago.edu/academics/common-data-set"
+    "sourceName": "school-published Common Data Set",
+    "meritAid": null,
+    "internationalEnrollmentPct": 18.6
   },
   "221759": {
     "id": 221759,
@@ -292,7 +353,12 @@
     "edOffered": true,
     "eaOffered": false,
     "waitlistOffered": null,
-    "sourceUrl": "https://www.vanderbilt.edu/isa/cds/"
+    "sourceName": "school-published Common Data Set",
+    "meritAid": {
+      "recipientShare": 0.12,
+      "avgAward": 19500
+    },
+    "internationalEnrollmentPct": 11.4
   },
   "153658": {
     "id": 153658,
@@ -317,7 +383,12 @@
     "edOffered": false,
     "eaOffered": true,
     "waitlistOffered": null,
-    "sourceUrl": "https://ir.aa.ufl.edu/common-data-set/"
+    "sourceName": "school-published Common Data Set",
+    "meritAid": {
+      "recipientShare": 0.35,
+      "avgAward": 8900
+    },
+    "internationalEnrollmentPct": 5.3
   },
   "196097": {
     "id": 196097,
@@ -332,7 +403,12 @@
     "edOffered": true,
     "eaOffered": false,
     "waitlistOffered": null,
-    "sourceUrl": "https://www.nyu.edu/about/policies-guidelines-compliance/cds.html"
+    "sourceName": "school-published Common Data Set",
+    "meritAid": {
+      "recipientShare": 0.19,
+      "avgAward": 17300
+    },
+    "internationalEnrollmentPct": 26.7
   },
   "110671": {
     "id": 110671,
@@ -357,6 +433,11 @@
     "edOffered": false,
     "eaOffered": true,
     "waitlistOffered": null,
-    "sourceUrl": "https://www.psu.edu/this-is-penn-state/university-factbook/common-data-set"
+    "sourceName": "school-published Common Data Set",
+    "meritAid": {
+      "recipientShare": 0.2,
+      "avgAward": 7600
+    },
+    "internationalEnrollmentPct": 4.1
   }
 }

@@ -12,6 +12,11 @@ const fs = require("fs");
 const path = require("path");
 
 const API_BASE = "https://www.collegedata.fyi/api";
+const RAW_API_BASE = "https://api.collegedata.fyi/rest/v1";
+// Public, read-only key published in CollegeData.FYI's own API docs —
+// safe to embed, grants no write access.
+const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlzZHV3bXlndm1kb3pocHZ6YWl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMDk3NTksImV4cCI6MjA5MTY4NTc1OX0.fYZOIHyrOWzidgc-CVxWCY5Fe9pQk12-6YjDIS6y9qs";
+const RAW_HEADERS = { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` };
 // Polite practice per their docs: identify this project in requests.
 const CLIENT_HEADER = { "X-CollegeData-Client": "us-university-catalog" };
 
@@ -41,7 +46,43 @@ function factValue(facts, key) {
   return fact.value;
 }
 
-function normalize(schoolId, schoolName, facts) {
+// Merit (non-need-based) aid data — from the raw school_merit_profile
+// table, since the friendly /facts endpoint doesn't expose it.
+async function fetchMeritAid(slug) {
+  const url = `${RAW_API_BASE}/school_merit_profile?school_id=eq.${slug}&select=first_year_ft_students,non_need_aid_recipients_first_year_ft,avg_non_need_grant_first_year_ft,non_need_aid_share_first_year_ft`;
+  const res = await fetch(url, { headers: RAW_HEADERS });
+  if (!res.ok) return null;
+  const rows = await res.json();
+  return rows[0] || null;
+}
+
+// International (nonresident-alien, the federal IPEDS category) enrollment
+// share. The exact field_key isn't confirmed ahead of time, so instead of
+// guessing one key, we pull every fact for the school and search by label
+// text — more resilient to naming differences, and logs what it found (or
+// didn't) so a mismatch is easy to diagnose from the Action run log.
+async function fetchInternationalShare(slug, logSample) {
+  const url = `${RAW_API_BASE}/school_facts_unified?school_id=eq.${slug}&select=field_key,field_label,display_value,value_numeric,unit`;
+  const res = await fetch(url, { headers: RAW_HEADERS });
+  if (!res.ok) return null;
+  const rows = await res.json();
+
+  if (logSample) {
+    console.log(
+      "\nSample school_facts_unified rows (for verifying international field name):\n",
+      JSON.stringify(rows.slice(0, 5), null, 2).slice(0, 800),
+      "\n"
+    );
+  }
+
+  const match = rows.find((r) =>
+    /international|nonresident/i.test(r.field_label || "") || /international|nonresident/i.test(r.field_key || "")
+  );
+  if (!match) return null;
+  return { value: match.value_numeric, label: match.field_label, fieldKey: match.field_key };
+}
+
+function normalize(schoolId, schoolName, facts, meritAid, international) {
   if (!facts) {
     return { id: schoolId, name: schoolName, hasCdsData: false };
   }
@@ -68,7 +109,14 @@ function normalize(schoolId, schoolName, facts) {
     edOffered: factValue(facts, "ed_offered"),
     eaOffered: factValue(facts, "ea_offered"),
     waitlistOffered: factValue(facts, "wait_list_offered"),
-    sourceUrl: facts.sources?.find((s) => s.kind === "cds_document")?.archive_url || null,
+    sourceName: "school-published Common Data Set",
+    meritAid: meritAid && meritAid.first_year_ft_students
+      ? {
+          recipientShare: meritAid.non_need_aid_share_first_year_ft,
+          avgAward: meritAid.avg_non_need_grant_first_year_ft,
+        }
+      : null,
+    internationalEnrollmentPct: international ? international.value : null,
   };
 }
 
@@ -78,6 +126,7 @@ async function main() {
   const cdsData = {};
 
   console.log(`Fetching CDS data for ${schools.length} schools from CollegeData.FYI...`);
+  let loggedInternationalSample = false;
 
   for (let i = 0; i < schools.length; i++) {
     const school = schools[i];
@@ -89,7 +138,11 @@ async function main() {
         continue;
       }
       const facts = await fetchFacts(slug);
-      cdsData[school.id] = normalize(school.id, school.name, facts);
+      const meritAid = await fetchMeritAid(slug).catch(() => null);
+      const international = await fetchInternationalShare(slug, !loggedInternationalSample).catch(() => null);
+      loggedInternationalSample = true;
+
+      cdsData[school.id] = normalize(school.id, school.name, facts, meritAid, international);
       console.log(`  ${i + 1}/${schools.length}: ${school.name} — matched "${slug}"`);
     } catch (err) {
       cdsData[school.id] = { id: school.id, name: school.name, hasCdsData: false };

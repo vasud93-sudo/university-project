@@ -26,11 +26,45 @@ async function init() {
   renderScorecard(school);
 
   if (cdsRecord && cdsRecord.hasCdsData) {
+    renderInternational(cdsRecord);
     renderAdmissionStrategy(cdsRecord);
     renderComparator(cdsRecord);
   } else {
     document.getElementById("no-cds-section").hidden = false;
   }
+}
+
+function renderInternational(cds) {
+  const section = document.getElementById("international-section");
+  const stats = [];
+
+  if (cds.internationalEnrollmentPct != null) {
+    stats.push(["International students enrolled", `${cds.internationalEnrollmentPct}%`]);
+  }
+  if (cds.meritAid) {
+    stats.push(["First-years getting merit aid", fmtPct(cds.meritAid.recipientShare)]);
+    stats.push(["Average merit award", fmtMoney(cds.meritAid.avgAward)]);
+  }
+
+  if (stats.length === 0) {
+    section.hidden = true;
+    return;
+  }
+
+  document.getElementById("international-stats").innerHTML = stats
+    .map(([label, value]) => `
+      <div class="detail-stat">
+        <span class="stat-label">${label}</span>
+        <span class="stat-value">${value}</span>
+      </div>`)
+    .join("");
+
+  const notes = [];
+  if (cds.internationalEnrollmentPct == null) notes.push("International enrollment share not reported.");
+  if (!cds.meritAid) notes.push("Merit aid is typically the main aid pathway open to international students, since need-based federal aid requires US citizenship or eligible noncitizen status — no merit aid data was found for this school.");
+  document.getElementById("international-note").textContent = notes.join(" ") || "";
+
+  section.hidden = false;
 }
 
 function renderHeader(s) {
@@ -75,9 +109,7 @@ function renderAdmissionStrategy(cds) {
     .join("");
 
   const sourceEl = document.getElementById("admission-source");
-  sourceEl.innerHTML = cds.sourceUrl
-    ? `Source: <a href="${cds.sourceUrl}" target="_blank" rel="noopener">school-published Common Data Set</a>`
-    : "Source: school-published Common Data Set";
+  sourceEl.textContent = `Source: ${cds.sourceName || "school-published Common Data Set"}`;
 
   section.hidden = false;
 }
