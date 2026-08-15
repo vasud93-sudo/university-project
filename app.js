@@ -162,16 +162,25 @@ function bareDomain(url) {
   return url.replace(/^https?:\/\//, "").replace(/^www\./, "").split("/")[0].trim() || null;
 }
 
-// Real logo via apistemic logos (free, no API key, domain-based lookup —
-// see https://logos.apistemic.com). Falls back to the initials badge if
-// the image 404s or the school has no usable domain on file.
+// Real logo via logo.dev, which maintains genuine coverage for US
+// universities (confirmed: Harvard, MIT, Stanford, and 90+ others in
+// their college-logos set) — unlike some general-purpose logo APIs,
+// which are built for tech/SaaS company domains and don't reliably
+// cover .edu domains. Requires a free API token: sign up at
+// https://www.logo.dev/signup, then paste your token below.
+// Falls back to the initials badge if the image 404s, the token is
+// missing, or the school has no usable domain on file.
+const LOGO_DEV_TOKEN = "REPLACE_WITH_YOUR_TOKEN"; // <-- paste your free logo.dev token here
+
 function avatarHtml(s) {
   const initials = initialsFor(s.name);
   const domain = bareDomain(s.url);
-  if (!domain) return `<div class="uni-card-avatar">${initials}</div>`;
+  if (!domain || LOGO_DEV_TOKEN === "REPLACE_WITH_YOUR_TOKEN") {
+    return `<div class="uni-card-avatar">${initials}</div>`;
+  }
 
   const fallbackHtml = `<div class='uni-card-avatar'>${initials}</div>`.replace(/"/g, "&quot;");
-  return `<img class="uni-card-avatar" src="https://logos-api.apistemic.com/domain:${domain}" alt="" loading="lazy" data-fallback="${fallbackHtml}" onerror="this.replaceWith(document.createRange().createContextualFragment(this.dataset.fallback))" />`;
+  return `<img class="uni-card-avatar" src="https://img.logo.dev/${domain}?token=${LOGO_DEV_TOKEN}&size=92&format=webp" alt="" loading="lazy" data-fallback="${fallbackHtml}" onerror="this.replaceWith(document.createRange().createContextualFragment(this.dataset.fallback))" />`;
 }
 
 function cardHtml(s) {
