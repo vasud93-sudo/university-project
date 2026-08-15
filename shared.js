@@ -8,7 +8,7 @@
 // which are built for tech/SaaS company domains and don't reliably
 // cover .edu domains. Requires a free API token: sign up at
 // https://www.logo.dev/signup, then paste your token below.
-const LOGO_DEV_TOKEN = "REPLACE_WITH_YOUR_TOKEN"; // <-- paste your free logo.dev token here
+const LOGO_DEV_TOKEN = "pk_M41PnphQQySRY99z9ZQobw"; // <-- paste your free logo.dev token here
 
 // Escapes HTML-significant characters before interpolating any data-sourced
 // string into markup. The data here comes from a trusted federal API today,
