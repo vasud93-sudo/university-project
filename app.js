@@ -184,7 +184,7 @@ function bareDomain(url) {
 // https://www.logo.dev/signup, then paste your token below.
 // Falls back to the initials badge if the image 404s, the token is
 // missing, or the school has no usable domain on file.
-const LOGO_DEV_TOKEN = "REPLACE_WITH_YOUR_TOKEN"; // <-- paste your free logo.dev token here
+const LOGO_DEV_TOKEN = "pk_M41PnphQQySRY99z9ZQobw"; // <-- paste your free logo.dev token here
 
 function avatarHtml(s) {
   const initials = initialsFor(s.name);
@@ -194,7 +194,7 @@ function avatarHtml(s) {
   }
 
   const fallbackHtml = `<div class='uni-card-avatar'>${escapeHtml(initials)}</div>`.replace(/"/g, "&quot;");
-  return `<img class="uni-card-avatar" src="https://img.logo.dev/${encodeURIComponent(domain)}?token=${encodeURIComponent(LOGO_DEV_TOKEN)}&size=92&format=webp" alt="" loading="lazy" data-fallback="${fallbackHtml}" onerror="this.replaceWith(document.createRange().createContextualFragment(this.dataset.fallback))" />`;
+  return `<img class="uni-card-avatar" src="https://img.logo.dev/${encodeURIComponent(domain)}?token=${encodeURIComponent(LOGO_DEV_TOKEN)}&size=92&format=webp" alt="" data-fallback="${fallbackHtml}" onerror="this.replaceWith(document.createRange().createContextualFragment(this.dataset.fallback))" />`;
 }
 
 function cardHtml(s) {
