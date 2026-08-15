@@ -25,10 +25,10 @@ async function init() {
   renderHeader(school);
   renderScorecard(school);
 
-  if (cdsRecord && cdsRecord.hasCdsData) {
+  if (cdsRecord && cdsRecord.hasAnyData) {
     renderInternational(cdsRecord);
-    renderAdmissionStrategy(cdsRecord);
-    renderComparator(cdsRecord);
+    renderAdmissionStrategy(cdsRecord); // internally checks its own fields; hides itself if none are present
+    renderComparator(cdsRecord); // internally checks SAT/ACT presence; works even without a full CDS document
   } else {
     document.getElementById("no-cds-section").hidden = false;
   }

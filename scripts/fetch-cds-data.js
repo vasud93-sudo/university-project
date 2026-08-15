@@ -20,6 +20,20 @@ const RAW_HEADERS = { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` };
 // Polite practice per their docs: identify this project in requests.
 const CLIENT_HEADER = { "X-CollegeData-Client": "us-university-catalog" };
 
+// Every fetch here has an explicit timeout — without one, a single slow
+// or hung request could stall the entire script indefinitely (this is
+// almost certainly what happened on a run that ran 30+ minutes with no
+// sign of finishing). 8 seconds is generous for a small JSON API response.
+async function fetchWithTimeout(url, options = {}, timeoutMs = 8000) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 // College Scorecard names often carry campus suffixes (e.g. "-Main Campus",
 // "-Ann Arbor") that don't match how CollegeData.FYI indexes school names,
 // silently breaking the search. This tries several increasingly-simplified
@@ -39,8 +53,8 @@ function searchQueryCandidates(schoolName, domain) {
 
 async function trySearch(query) {
   const url = `${API_BASE}/schools/search?q=${encodeURIComponent(query)}`;
-  const res = await fetch(url, { headers: CLIENT_HEADER });
-  if (!res.ok) return null;
+  const res = await fetchWithTimeout(url, { headers: CLIENT_HEADER }).catch(() => null);
+  if (!res || !res.ok) return null;
   const data = await res.json();
   const results = data.results || data.schools || data;
   if (!Array.isArray(results) || results.length === 0) return null;
@@ -57,8 +71,8 @@ async function findSlug(schoolName, domain) {
 
 async function fetchFacts(slug) {
   const url = `${API_BASE}/schools/${slug}/facts?categories=admissions`;
-  const res = await fetch(url, { headers: CLIENT_HEADER });
-  if (!res.ok) return null;
+  const res = await fetchWithTimeout(url, { headers: CLIENT_HEADER }).catch(() => null);
+  if (!res || !res.ok) return null;
   return res.json();
 }
 
@@ -75,8 +89,8 @@ function factValue(facts, key) {
 // table, since the friendly /facts endpoint doesn't expose it.
 async function fetchMeritAid(slug) {
   const url = `${RAW_API_BASE}/school_merit_profile?school_id=eq.${slug}&select=first_year_ft_students,non_need_aid_recipients_first_year_ft,avg_non_need_grant_first_year_ft,non_need_aid_share_first_year_ft`;
-  const res = await fetch(url, { headers: RAW_HEADERS });
-  if (!res.ok) return null;
+  const res = await fetchWithTimeout(url, { headers: RAW_HEADERS }).catch(() => null);
+  if (!res || !res.ok) return null;
   const rows = await res.json();
   return rows[0] || null;
 }
@@ -88,8 +102,8 @@ async function fetchMeritAid(slug) {
 // didn't) so a mismatch is easy to diagnose from the Action run log.
 async function fetchInternationalShare(slug, logSample) {
   const url = `${RAW_API_BASE}/school_facts_unified?school_id=eq.${slug}&select=field_key,field_label,display_value,value_numeric,unit`;
-  const res = await fetch(url, { headers: RAW_HEADERS });
-  if (!res.ok) return null;
+  const res = await fetchWithTimeout(url, { headers: RAW_HEADERS }).catch(() => null);
+  if (!res || !res.ok) return null;
   const rows = await res.json();
 
   if (logSample) {
@@ -141,24 +155,35 @@ function normalize(schoolId, schoolName, facts, meritAid, international) {
   // provides one — this is their own recorded source, not a guessed URL.
   const cdsDocumentUrl = facts.sources?.find((s) => s.kind === "cds_document")?.archive_url || null;
 
-  // A response can technically succeed (200 OK) even when the school has
-  // no real CDS document behind it — CollegeData.FYI may still return a
-  // profile shell with every field empty. Only count a school as "has CDS
-  // data" if at least one substantive field actually has a value; this
-  // keeps the site's coverage numbers honest rather than overcounting.
-  const hasCdsData = [
+  // Two different questions, deliberately kept separate:
+  //
+  // hasCdsData (strict) — does a genuine CDS document exist for this
+  // school? Only true if a field that's EXCLUSIVELY CDS-sourced has a
+  // value (satComposite50, ED/EA/waitlist status, merit aid). Drives the
+  // "CDS data" filter/badge and the admission-strategy section, since
+  // those specifically represent CDS content.
+  //
+  // hasAnyData (broad) — is there anything at all worth showing? SAT/ACT
+  // ranges here are actually sourced from "ipeds.*" fields — real federal
+  // IPEDS reporting that most schools have regardless of whether they
+  // publish a CDS. That data is still genuinely useful (it's what powers
+  // the "where you stand" comparator) and shouldn't be discarded just
+  // because it doesn't prove a CDS document exists.
+  const hasCdsData = [satComposite50, edOffered, eaOffered, waitlistOffered, meritAidResult].some((v) => v != null);
+  const hasAnyData = [
     satComposite50, satComposite25, actComposite25, actComposite50,
     edOffered, eaOffered, waitlistOffered, meritAidResult, internationalEnrollmentPct,
   ].some((v) => v != null);
 
-  if (!hasCdsData) {
-    return { id: schoolId, name: schoolName, hasCdsData: false };
+  if (!hasAnyData) {
+    return { id: schoolId, name: schoolName, hasCdsData: false, hasAnyData: false };
   }
 
   return {
     id: schoolId,
     name: schoolName,
-    hasCdsData: true,
+    hasCdsData,
+    hasAnyData: true,
     satComposite50,
     satComposite25,
     satComposite75,
@@ -175,37 +200,63 @@ function normalize(schoolId, schoolName, facts, meritAid, international) {
   };
 }
 
+// Processes one school: find its slug, then run the facts/merit/international
+// lookups IN PARALLEL (they're independent of each other) instead of one
+// after another — this alone cuts per-school time roughly 3x.
+async function processSchool(school, loggedInternationalSampleRef) {
+  const slug = await findSlug(school.name, school.url);
+  if (!slug) {
+    return { id: school.id, name: school.name, hasCdsData: false };
+  }
+
+  const shouldLog = !loggedInternationalSampleRef.done;
+  loggedInternationalSampleRef.done = true;
+
+  const [facts, meritAid, international] = await Promise.all([
+    fetchFacts(slug).catch(() => null),
+    fetchMeritAid(slug).catch(() => null),
+    fetchInternationalShare(slug, shouldLog).catch(() => null),
+  ]);
+
+  return normalize(school.id, school.name, facts, meritAid, international);
+}
+
+// Runs schools with limited concurrency (CONCURRENCY at a time) instead of
+// one at a time. Fully serial processing of ~1,944 schools at several
+// requests each was taking 30-60+ minutes; this cuts wall-clock time
+// roughly in proportion to the concurrency level while still being a
+// reasonable, non-abusive load on a small free API.
+const CONCURRENCY = 8;
+
 async function main() {
   const schoolsPath = path.join(__dirname, "..", "data", "schools.json");
   const schools = JSON.parse(fs.readFileSync(schoolsPath, "utf8"));
   const cdsData = {};
+  const loggedInternationalSampleRef = { done: false };
 
-  console.log(`Fetching CDS data for ${schools.length} schools from CollegeData.FYI...`);
-  let loggedInternationalSample = false;
+  console.log(`Fetching CDS data for ${schools.length} schools from CollegeData.FYI (concurrency: ${CONCURRENCY})...`);
 
-  for (let i = 0; i < schools.length; i++) {
-    const school = schools[i];
-    try {
-      const slug = await findSlug(school.name, school.url);
-      if (!slug) {
+  let completed = 0;
+  let index = 0;
+
+  async function worker() {
+    while (index < schools.length) {
+      const i = index++;
+      const school = schools[i];
+      try {
+        cdsData[school.id] = await processSchool(school, loggedInternationalSampleRef);
+      } catch (err) {
         cdsData[school.id] = { id: school.id, name: school.name, hasCdsData: false };
-        console.log(`  ${i + 1}/${schools.length}: ${school.name} — no match found`);
-        continue;
       }
-      const facts = await fetchFacts(slug);
-      const meritAid = await fetchMeritAid(slug).catch(() => null);
-      const international = await fetchInternationalShare(slug, !loggedInternationalSample).catch(() => null);
-      loggedInternationalSample = true;
-
-      cdsData[school.id] = normalize(school.id, school.name, facts, meritAid, international);
-      console.log(`  ${i + 1}/${schools.length}: ${school.name} — matched "${slug}"`);
-    } catch (err) {
-      cdsData[school.id] = { id: school.id, name: school.name, hasCdsData: false };
-      console.log(`  ${i + 1}/${schools.length}: ${school.name} — error: ${err.message}`);
+      completed++;
+      if (completed % 25 === 0 || completed === schools.length) {
+        const matchedSoFar = Object.values(cdsData).filter((s) => s.hasCdsData).length;
+        console.log(`  ${completed}/${schools.length} processed (${matchedSoFar} matched so far)`);
+      }
     }
-    // Be a polite API citizen — small pause between requests.
-    await new Promise((r) => setTimeout(r, 120));
   }
+
+  await Promise.all(Array.from({ length: CONCURRENCY }, () => worker()));
 
   const outPath = path.join(__dirname, "..", "data", "cds.json");
   fs.writeFileSync(outPath, JSON.stringify(cdsData, null, 2));
