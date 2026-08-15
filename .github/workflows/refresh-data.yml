@@ -2,8 +2,8 @@ name: Refresh College Scorecard data
 
 on:
   schedule:
-    - cron: "0 6 1 * *"
-  workflow_dispatch: {}
+    - cron: "0 6 1 * *" # 6am UTC on the 1st of every month
+  workflow_dispatch: {} # lets you trigger it manually from the Actions tab
 
 permissions:
   contents: write
@@ -13,17 +13,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - name: Fetch latest data
+
+      - name: Fetch latest Scorecard data
         env:
           COLLEGE_SCORECARD_API_KEY: ${{ secrets.COLLEGE_SCORECARD_API_KEY }}
         run: node scripts/fetch-data.js
+
+      - name: Fetch latest CDS data
+        run: node scripts/fetch-cds-data.js
+
       - name: Commit updated data
         run: |
           git config user.name "data-refresh-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/schools.json
-          git diff --cached --quiet || git commit -m "chore: refresh College Scorecard data"
+          git add data/schools.json data/cds.json
+          git diff --cached --quiet || git commit -m "chore: refresh Scorecard and CDS data"
           git push
