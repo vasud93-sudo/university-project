@@ -80,6 +80,25 @@ country:
 
 ## Top majors filter
 
+## CDS-sourced admission data (click into a school for this)
+
+Clicking "Details" on any school card opens a per-school page
+(`school.html?id=...`) with two extra sections sourced from
+CollegeData.FYI's Common Data Set archive — no API key needed, it's open:
+
+- **Admission strategy badges** — Early Decision/Action offered, waitlist size
+- **Interactive SAT/ACT comparator** — type in your own score and see where
+  it lands against that school's middle-50% admitted range
+
+Run `node scripts/fetch-cds-data.js` to pull real data into `data/cds.json`
+(same pattern as `fetch-data.js`, no key required this time). It's included
+in the automated monthly refresh workflow alongside the Scorecard pull.
+
+Coverage is partial — only schools with a publicly archived CDS will show
+these sections; others get a plain "not available" note instead of missing
+or broken UI.
+
+
 Each school now lists its top 10 bachelor's-level majors, ranked by number of
 graduates (the biggest, most established programs — not just anything
 technically offered). These show as tags on each card and power the new

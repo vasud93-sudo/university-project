@@ -294,6 +294,21 @@ main {
   padding-top: 6px;
 }
 
+.uni-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.details-link {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--library-green-dark);
+  text-decoration: none;
+  border-bottom: 1px solid var(--library-green-dark);
+  white-space: nowrap;
+}
+
 .uni-card-link {
   font-family: var(--font-mono);
   font-size: 0.74rem;
@@ -442,6 +457,218 @@ main {
   inset: 0;
   background: rgba(20, 24, 16, 0.35);
   z-index: 25;
+}
+
+/* ---------- Detail page ---------- */
+
+.back-link {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--paper);
+  text-decoration: none;
+  border-bottom: 1px solid var(--paper);
+  margin-bottom: 10px;
+}
+
+.detail-main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 28px 24px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.detail-card {
+  background: var(--card);
+  border: 1px solid var(--brass);
+  border-radius: 3px;
+  padding: 20px 22px;
+}
+
+.detail-card-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Explicit dark text on a light tint — never inherited — so labels stay
+   readable regardless of surrounding theme or dark-mode contexts. */
+.source-tag {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--library-green-dark);
+  background: var(--paper);
+  border: 1px solid var(--library-green-dark);
+  border-radius: 10px;
+  padding: 1px 7px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.source-tag-cds {
+  color: var(--stamp-red);
+  border-color: var(--stamp-red);
+}
+
+.detail-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+}
+
+.detail-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: var(--font-mono);
+}
+
+.detail-stat .stat-value {
+  font-size: 1.1rem;
+  color: var(--ink);
+}
+
+.badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+/* Same explicit-dark-text pattern as .uni-card-tag — background is always
+   the light paper tone, text is always the dark green, never inherited. */
+.admission-badge {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  color: var(--library-green-dark);
+  background: var(--paper);
+  border: 1px solid var(--library-green-dark);
+  border-radius: 12px;
+  padding: 5px 12px;
+}
+
+.detail-source-note {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--ink-soft);
+  border-top: 1px dashed var(--brass);
+  padding-top: 10px;
+  margin: 0;
+}
+
+.detail-source-note a { color: var(--library-green-dark); }
+
+.comparator-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.toggle-btn {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: var(--paper);
+  border: 1px solid var(--brass);
+  border-radius: 2px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+.toggle-btn.active {
+  color: white;
+  background: var(--library-green);
+  border-color: var(--library-green-dark);
+}
+
+.toggle-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.comparator-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.comparator-row label {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.comparator-row input[type="range"] {
+  flex: 1;
+  accent-color: var(--stamp-red);
+}
+
+.score-output {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--ink);
+  min-width: 3ch;
+  text-align: right;
+}
+
+.range-bar-wrap {
+  position: relative;
+  height: 26px;
+  margin-bottom: 6px;
+}
+
+.range-bar-track {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: var(--paper);
+  border-radius: 3px;
+}
+
+.range-bar-fill {
+  position: absolute;
+  top: 10px;
+  height: 6px;
+  background: var(--library-green);
+  border-radius: 3px;
+}
+
+.range-marker {
+  position: absolute;
+  top: 2px;
+  width: 2px;
+  height: 22px;
+  background: var(--stamp-red);
+}
+
+.range-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--ink-soft);
+  margin-bottom: 16px;
+}
+
+.comparator-verdict {
+  font-size: 0.88rem;
+  color: var(--ink);
+  border-top: 1px dashed var(--brass);
+  padding-top: 12px;
+  margin: 0;
 }
 
 /* ---------- Footer ---------- */

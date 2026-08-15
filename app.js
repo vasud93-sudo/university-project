@@ -150,9 +150,12 @@ function cardHtml(s) {
       ${programsHtml(s.topPrograms)}
       <div class="uni-card-foot">
         <a class="uni-card-link" href="https://${s.url}" target="_blank" rel="noopener">${s.url || ""}</a>
-        <button class="pull-button ${pulled ? "pulled" : ""}" data-id="${s.id}">
-          ${pulled ? "✓ On shortlist" : "+ Pull card"}
-        </button>
+        <div class="uni-card-actions">
+          <a class="details-link" href="school.html?id=${s.id}">Details &rarr;</a>
+          <button class="pull-button ${pulled ? "pulled" : ""}" data-id="${s.id}">
+            ${pulled ? "✓ On shortlist" : "+ Pull card"}
+          </button>
+        </div>
       </div>
     </article>
   `;

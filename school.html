@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>School details — US University Catalog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="masthead-title">
+      <a href="index.html" class="back-link">&larr; Back to catalog</a>
+      <h1 id="school-name">Loading&hellip;</h1>
+      <p class="tagline" id="school-loc"></p>
+    </div>
+  </div>
+</header>
+
+<main class="detail-main">
+
+  <section class="detail-card" id="scorecard-section">
+    <div class="detail-card-label">From College Scorecard <span class="source-tag">federal data</span></div>
+    <div class="detail-stats-grid" id="scorecard-stats"></div>
+  </section>
+
+  <section class="detail-card" id="admission-strategy-section" hidden>
+    <div class="detail-card-label">Admission strategy <span class="source-tag source-tag-cds">from CDS</span></div>
+    <div class="badge-row" id="admission-badges"></div>
+    <p class="detail-source-note" id="admission-source"></p>
+  </section>
+
+  <section class="detail-card" id="comparator-section" hidden>
+    <div class="detail-card-label">Where you stand <span class="source-tag source-tag-cds">interactive</span></div>
+
+    <div class="comparator-toggle">
+      <button class="toggle-btn active" data-test="sat">SAT</button>
+      <button class="toggle-btn" data-test="act">ACT</button>
+    </div>
+
+    <div class="comparator-row">
+      <label for="score-input">Your score</label>
+      <input type="range" id="score-input" />
+      <span id="score-output" class="score-output"></span>
+    </div>
+
+    <div class="range-bar-wrap">
+      <div class="range-bar-track"></div>
+      <div class="range-bar-fill" id="range-fill"></div>
+      <div class="range-marker" id="range-marker"></div>
+    </div>
+    <div class="range-labels" id="range-labels"></div>
+
+    <p class="comparator-verdict" id="comparator-verdict"></p>
+  </section>
+
+  <section class="detail-card" id="no-cds-section" hidden>
+    <div class="detail-card-label">Admission strategy &amp; test scores</div>
+    <p class="detail-source-note">No Common Data Set is publicly archived for this school yet, so admission-strategy detail and test-score ranges aren't available here.</p>
+  </section>
+
+</main>
+
+<script src="school.js"></script>
+</body>
+</html>
