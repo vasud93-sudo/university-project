@@ -494,8 +494,15 @@ main {
   padding: 11px;
   cursor: pointer;
   letter-spacing: 0.02em;
+  display: block;
+  text-align: center;
+  text-decoration: none;
 }
 .stamp-button:hover { filter: brightness(1.08); }
+
+.map-button {
+  background: var(--library-green);
+}
 
 .text-button {
   background: none;

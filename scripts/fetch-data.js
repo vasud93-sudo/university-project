@@ -22,6 +22,8 @@ const FIELDS = [
   "school.state",
   "school.school_url",
   "school.ownership", // 1=public, 2=private nonprofit, 3=private for-profit
+  "location.lat",
+  "location.lon",
   "latest.cost.tuition.in_state",
   "latest.cost.tuition.out_of_state",
   "latest.admissions.admission_rate.overall",
@@ -85,6 +87,8 @@ function normalize(raw) {
     state: raw["school.state"],
     url: raw["school.school_url"],
     ownership: ownershipLabel(raw["school.ownership"]),
+    lat: raw["location.lat"],
+    lon: raw["location.lon"],
     tuitionInState: raw["latest.cost.tuition.in_state"],
     tuitionOutOfState: raw["latest.cost.tuition.out_of_state"],
     admissionRate: raw["latest.admissions.admission_rate.overall"],

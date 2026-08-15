@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Map view — US University Catalog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="style.css" />
+<style>
+  #map {
+    height: 100%;
+    width: 100%;
+    background: var(--paper);
+  }
+  .map-wrap {
+    position: relative;
+    height: calc(100vh - 140px);
+    min-height: 420px;
+    border-top: 1px solid var(--brass);
+  }
+  /* Override Leaflet's default popup chrome to match the card-catalog theme */
+  .leaflet-popup-content-wrapper {
+    background: var(--card);
+    border: 1px solid var(--brass);
+    border-radius: 3px;
+    box-shadow: 2px 3px 0 var(--shadow);
+  }
+  .leaflet-popup-tip { background: var(--card); border: 1px solid var(--brass); }
+  .map-popup-name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--ink);
+    margin: 0 0 4px;
+  }
+  .map-popup-meta {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    margin: 0 0 6px;
+  }
+  .map-popup-link {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--library-green-dark);
+    text-decoration: none;
+    border-bottom: 1px solid var(--library-green-dark);
+  }
+  .map-empty-state {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+    background: var(--paper);
+    font-family: var(--font-mono);
+    color: var(--ink-soft);
+    text-align: center;
+    padding: 24px;
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="masthead-title">
+      <a href="index.html" class="back-link">&larr; Back to catalog</a>
+      <h1>Map view</h1>
+      <p class="tagline" id="map-subtitle">Your shortlisted schools, plotted geographically.</p>
+    </div>
+  </div>
+</header>
+
+<div class="map-wrap">
+  <div id="map"></div>
+  <div id="map-empty" class="map-empty-state" hidden>
+    <p>Your shortlist is empty, so there's nothing to plot yet.</p>
+    <a href="index.html" class="details-link">Go pull a few cards &rarr;</a>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <p>Map tiles &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors.</p>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="map.js"></script>
+</body>
+</html>
