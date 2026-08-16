@@ -222,15 +222,25 @@ function sortByPriority(list) {
     .map((x) => x.s);
 }
 
+let gridListenerAttached = false;
+
 function render() {
   const list = getFiltered();
   els.resultCount.textContent = `${list.length} school${list.length === 1 ? "" : "s"} on file`;
   els.emptyState.hidden = list.length !== 0;
   els.grid.innerHTML = list.map(cardHtml).join("");
 
-  els.grid.querySelectorAll(".pull-button").forEach((btn) => {
-    btn.addEventListener("click", () => togglePull(Number(btn.dataset.id)));
-  });
+  // Attach ONE delegated click listener on the grid, once, instead of one
+  // listener per card on every render — this was being re-created for up
+  // to ~1,944 buttons on every single render() call, adding real overhead
+  // on top of the DOM rebuild itself.
+  if (!gridListenerAttached) {
+    els.grid.addEventListener("click", (e) => {
+      const btn = e.target.closest(".pull-button");
+      if (btn) togglePull(Number(btn.dataset.id));
+    });
+    gridListenerAttached = true;
+  }
 
   renderShortlist();
 }
@@ -294,7 +304,18 @@ function togglePull(id) {
   if (shortlistIds.has(id)) shortlistIds.delete(id);
   else shortlistIds.add(id);
   saveShortlist();
-  render();
+
+  // Update just this one card's button in place — no need to rebuild the
+  // entire grid (potentially ~1,944 cards) for a single toggle. This was
+  // the actual source of the lag: every pull was re-rendering everything.
+  const btn = els.grid.querySelector(`.pull-button[data-id="${id}"]`);
+  if (btn) {
+    const pulled = shortlistIds.has(id);
+    btn.classList.toggle("pulled", pulled);
+    btn.textContent = pulled ? "✓ On shortlist" : "+ Pull card";
+  }
+
+  renderShortlist();
 }
 
 function saveShortlist() {
