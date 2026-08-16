@@ -74,7 +74,13 @@ async function fetchPage(page) {
 const CORE_STEM_CIP_PREFIXES = ["14", "26", "27", "40"];
 function isCoreStem(cipCode) {
   if (!cipCode) return false;
-  const prefix = String(cipCode).split(".")[0].padStart(2, "0");
+  // Real API format confirmed via debug log: a bare 4-digit string like
+  // "0109" (CIP family "01", sub-family "09") — NOT "14.1901" as
+  // originally assumed. The first 2 characters are the CIP family code
+  // regardless of whether a dot is present, so strip any dot first and
+  // take the first 2 digits either way — safe for both formats.
+  const digits = String(cipCode).replace(".", "");
+  const prefix = digits.slice(0, 2).padStart(2, "0");
   return CORE_STEM_CIP_PREFIXES.includes(prefix);
 }
 
