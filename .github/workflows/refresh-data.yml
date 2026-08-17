@@ -26,10 +26,13 @@ jobs:
       - name: Fetch latest CDS data
         run: node scripts/fetch-cds-data.js
 
+      - name: Fetch confirmed test-optional data from FairTest
+        run: node scripts/fetch-fairtest-data.js
+
       - name: Commit updated data
         run: |
           git config user.name "data-refresh-bot"
           git config user.email "actions@users.noreply.github.com"
           git add data/schools.json data/cds.json
-          git diff --cached --quiet || git commit -m "chore: refresh Scorecard and CDS data"
+          git diff --cached --quiet || git commit -m "chore: refresh Scorecard, CDS, and FairTest data"
           git push
