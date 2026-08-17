@@ -105,11 +105,13 @@ function renderAdmissionStrategy(cds) {
   document.getElementById("admission-strategy-tag").textContent = cds.hasCdsData ? "from CDS" : "from available data";
 
   if (cds.testOptional) {
-    const { status, confidence } = cds.testOptional;
+    const { status, confidence, source } = cds.testOptional;
     const label = status === "optional" ? "Test-optional" : "Test scores effectively required";
-    const suffix = confidence === "inferred" ? " (inferred)" : "";
+    const suffix = confidence === "inferred" ? " (inferred)" : source === "FairTest" ? " (confirmed via FairTest)" : "";
     const title = confidence === "inferred"
       ? "Not a directly stated policy — inferred from how many admitted students actually submitted SAT/ACT scores."
+      : source === "FairTest"
+      ? "Confirmed by FairTest (National Center for Fair & Open Testing), fairtest.org — the source journalists and college counselors cite for testing-policy tracking."
       : "School's directly stated testing policy.";
     badges.push({ text: label + suffix, title });
   }

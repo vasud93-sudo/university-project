@@ -89,14 +89,36 @@
   <section class="detail-card">
     <div class="detail-card-label">Test-optional status</div>
     <p class="method-text">
-      When a school directly states its testing policy, that's shown with
-      no qualifier. When no direct policy statement is available, the
-      badge instead reflects how many admitted students actually submitted
-      SAT/ACT scores — a well-below-100% submission rate is a practical
-      signal a school isn't requiring scores in effect, even without a
-      formal statement. These inferred badges are labeled "(inferred)" and
-      explained on hover; they're a reasonable signal, not a guaranteed
-      policy statement, and testing policies can change year to year.
+      Three levels of confidence, shown in order of reliability:
+      <strong>"(confirmed via FairTest)"</strong> — verified against
+      <a href="https://fairtest.org" target="_blank" rel="noopener">FairTest</a>
+      (the National Center for Fair &amp; Open Testing), the source
+      journalists and college counselors cite for testing-policy tracking.
+      This label can only ever confirm test-optional status — a school not
+      appearing on FairTest's list simply isn't confirmed by this source,
+      which is not the same as being confirmed as test-required.
+      <strong>No qualifier</strong> — the school directly states its
+      policy in the data pulled. <strong>"(inferred)"</strong> — no direct
+      statement was available, so the badge instead reflects how many
+      admitted students actually submitted SAT/ACT scores; a well-below-100%
+      submission rate is a practical signal, not a guaranteed policy
+      statement. Testing policies can and do change year to year — several
+      major universities reversed policy within the same year, so treat
+      any badge here as a starting point, not a final answer, and verify
+      directly with the school before relying on it for application
+      planning.
+    </p>
+  </section>
+
+  <section class="detail-card">
+    <div class="detail-card-label">A note on FairTest</div>
+    <p class="method-text">
+      FairTest is a small nonprofit that maintains this list as a public
+      service, funded by donations, not a commercial data provider. Their
+      site explicitly invites people to
+      <a href="https://fairtest.org/contact" target="_blank" rel="noopener">contact them directly</a>
+      for full database access rather than publishing an open API. If
+      you're building on this data yourself, consider supporting their work.
     </p>
   </section>
 
