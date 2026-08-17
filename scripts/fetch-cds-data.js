@@ -85,6 +85,52 @@ function factValue(facts, key) {
   return fact.value;
 }
 
+// Determines test-optional status two ways, in order of trust:
+//
+// 1. DIRECT: search every fact's key/label for something explicitly about
+//    testing policy (e.g. "test_optional", "testing policy"). If found,
+//    this is the school's actual stated policy — highest confidence.
+// 2. INFERRED: if no direct field exists, fall back to how many admitted
+//    students actually submitted SAT/ACT scores. A submit rate well below
+//    100% is a practical signal the school doesn't require them, even
+//    without an explicit policy field — lower confidence, clearly labeled
+//    as inferred wherever it's shown on the site.
+//
+// Returns null (unknown) rather than guessing when neither signal exists.
+function determineTestOptional(facts, logSample) {
+  const directFact = (facts.facts || []).find((f) =>
+    /test.*optional|optional.*test|testing.?polic/i.test(f.key || "") ||
+    /test.*optional|optional.*test|testing.?polic/i.test(f.label || "")
+  );
+
+  if (logSample) {
+    console.log(
+      "\nSample admissions facts (for verifying testing-policy field name):\n",
+      JSON.stringify((facts.facts || []).map((f) => ({ key: f.key, label: f.label, value: f.value })), null, 2).slice(0, 1200),
+      "\n"
+    );
+  }
+
+  if (directFact && directFact.value != null) {
+    // Normalize whatever shape the value comes in (boolean or string).
+    const val = directFact.value;
+    const isOptional = val === true || /optional|blind|flexible/i.test(String(val));
+    return { status: isOptional ? "optional" : "required", confidence: "confirmed" };
+  }
+
+  const satSubmitRate = factValue(facts, "sat_submit_rate");
+  const actSubmitRate = factValue(facts, "act_submit_rate");
+  const bestSubmitRate = [satSubmitRate, actSubmitRate].filter((v) => v != null).sort((a, b) => b - a)[0];
+
+  if (bestSubmitRate == null) return null;
+  // Below ~60% submission strongly suggests the school isn't requiring
+  // scores in practice; above ~90% suggests they effectively are.
+  // Between those, the signal is too weak to call confidently.
+  if (bestSubmitRate < 0.6) return { status: "optional", confidence: "inferred" };
+  if (bestSubmitRate > 0.9) return { status: "required", confidence: "inferred" };
+  return null;
+}
+
 // Merit (non-need-based) aid data — from the raw school_merit_profile
 // table, since the friendly /facts endpoint doesn't expose it.
 async function fetchMeritAid(slug) {
@@ -121,7 +167,7 @@ async function fetchInternationalShare(slug, logSample) {
   return { value: match.value_numeric, label: match.field_label, fieldKey: match.field_key };
 }
 
-function normalize(schoolId, schoolName, facts, meritAid, international) {
+function normalize(schoolId, schoolName, facts, meritAid, international, logTestOptionalSample) {
   if (!facts) {
     return { id: schoolId, name: schoolName, hasCdsData: false };
   }
@@ -151,6 +197,7 @@ function normalize(schoolId, schoolName, facts, meritAid, international) {
       }
     : null;
   const internationalEnrollmentPct = international ? international.value : null;
+  const testOptional = determineTestOptional(facts, logTestOptionalSample);
   // A link to the actual archived CDS document, when CollegeData.FYI
   // provides one — this is their own recorded source, not a guessed URL.
   const cdsDocumentUrl = facts.sources?.find((s) => s.kind === "cds_document")?.archive_url || null;
@@ -172,7 +219,7 @@ function normalize(schoolId, schoolName, facts, meritAid, international) {
   const hasCdsData = [satComposite50, edOffered, eaOffered, waitlistOffered, meritAidResult].some((v) => v != null);
   const hasAnyData = [
     satComposite50, satComposite25, actComposite25, actComposite50,
-    edOffered, eaOffered, waitlistOffered, meritAidResult, internationalEnrollmentPct,
+    edOffered, eaOffered, waitlistOffered, meritAidResult, internationalEnrollmentPct, testOptional,
   ].some((v) => v != null);
 
   if (!hasAnyData) {
@@ -197,6 +244,7 @@ function normalize(schoolId, schoolName, facts, meritAid, international) {
     cdsDocumentUrl,
     meritAid: meritAidResult,
     internationalEnrollmentPct,
+    testOptional, // { status: "optional"|"required", confidence: "confirmed"|"inferred" } or null
   };
 }
 
@@ -218,7 +266,7 @@ async function processSchool(school, loggedInternationalSampleRef) {
     fetchInternationalShare(slug, shouldLog).catch(() => null),
   ]);
 
-  return normalize(school.id, school.name, facts, meritAid, international);
+  return normalize(school.id, school.name, facts, meritAid, international, shouldLog);
 }
 
 // Runs schools with limited concurrency (CONCURRENCY at a time) instead of
