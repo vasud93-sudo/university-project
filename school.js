@@ -98,10 +98,26 @@ function renderAdmissionStrategy(cds) {
   const section = document.getElementById("admission-strategy-section");
   const badges = [];
 
-  if (cds.edOffered === true) badges.push("Early Decision offered");
-  if (cds.eaOffered === true) badges.push("Early Action offered");
-  if (cds.edOffered === false && cds.eaOffered === false) badges.push("No ED or EA");
-  if (cds.waitlistOffered != null) badges.push(`Waitlist: ${fmtInt(cds.waitlistOffered)} offered`);
+  // Only claim "from CDS" when a real CDS document backs this section.
+  // A school might reach this section purely on an INFERRED test-optional
+  // signal (from submission rates, not a stated policy) — mislabeling
+  // that as CDS content would overstate how reliable it is.
+  document.getElementById("admission-strategy-tag").textContent = cds.hasCdsData ? "from CDS" : "from available data";
+
+  if (cds.testOptional) {
+    const { status, confidence } = cds.testOptional;
+    const label = status === "optional" ? "Test-optional" : "Test scores effectively required";
+    const suffix = confidence === "inferred" ? " (inferred)" : "";
+    const title = confidence === "inferred"
+      ? "Not a directly stated policy — inferred from how many admitted students actually submitted SAT/ACT scores."
+      : "School's directly stated testing policy.";
+    badges.push({ text: label + suffix, title });
+  }
+
+  if (cds.edOffered === true) badges.push({ text: "Early Decision offered" });
+  if (cds.eaOffered === true) badges.push({ text: "Early Action offered" });
+  if (cds.edOffered === false && cds.eaOffered === false) badges.push({ text: "No ED or EA" });
+  if (cds.waitlistOffered != null) badges.push({ text: `Waitlist: ${fmtInt(cds.waitlistOffered)} offered` });
 
   if (badges.length === 0) {
     section.hidden = true;
@@ -109,7 +125,7 @@ function renderAdmissionStrategy(cds) {
   }
 
   document.getElementById("admission-badges").innerHTML = badges
-    .map((b) => `<span class="admission-badge">${b}</span>`)
+    .map((b) => `<span class="admission-badge"${b.title ? ` title="${escapeHtml(b.title)}"` : ""}>${escapeHtml(b.text)}</span>`)
     .join("");
 
   const sourceEl = document.getElementById("admission-source");

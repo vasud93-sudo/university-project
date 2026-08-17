@@ -13,6 +13,7 @@ const els = {
   tuition: document.getElementById("f-tuition"),
   admit: document.getElementById("f-admit"),
   cds: document.getElementById("f-cds"),
+  testOptional: document.getElementById("f-testoptional"),
   sort: document.getElementById("f-sort"),
   priorityPanel: document.getElementById("priority-panel"),
   prioritySliders: document.getElementById("priority-sliders"),
@@ -117,7 +118,7 @@ function getPriorityWeights() {
 }
 
 function bindEvents() {
-  [els.search, els.state, els.major, els.ownership, els.tuition, els.admit, els.cds, els.sort].forEach((el) =>
+  [els.search, els.state, els.major, els.ownership, els.tuition, els.admit, els.cds, els.testOptional, els.sort].forEach((el) =>
     el.addEventListener("input", () => {
       els.priorityPanel.hidden = els.sort.value !== "priority";
       render();
@@ -152,6 +153,7 @@ function getFiltered() {
   const maxTuition = els.tuition.value ? Number(els.tuition.value) : null;
   const minAdmit = els.admit.value ? Number(els.admit.value) : null;
   const cdsFilter = els.cds.value;
+  const testOptionalFilter = els.testOptional.value;
 
   let list = schools.filter((s) => {
     if (q && !`${s.name} ${s.city}`.toLowerCase().includes(q)) return false;
@@ -162,6 +164,10 @@ function getFiltered() {
     if (minAdmit != null && (s.admissionRate == null || s.admissionRate < minAdmit)) return false;
     if (cdsFilter === "yes" && !cdsIds.has(s.id)) return false;
     if (cdsFilter === "no" && cdsIds.has(s.id)) return false;
+    if (testOptionalFilter) {
+      const testStatus = cdsData[s.id]?.testOptional?.status ?? null;
+      if (testStatus !== testOptionalFilter) return false;
+    }
     return true;
   });
 
