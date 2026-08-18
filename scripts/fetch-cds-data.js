@@ -146,20 +146,26 @@ async function fetchMeritAid(slug) {
 // guessing one key, we pull every fact for the school and search by label
 // text — more resilient to naming differences, and logs what it found (or
 // didn't) so a mismatch is easy to diagnose from the Action run log.
-async function fetchInternationalShare(slug, logSample) {
+// Both international enrollment share and the C7 "Basis for Selection"
+// table live in the same broad facts table, so we fetch it once per
+// school and derive both from it — one request instead of two.
+async function fetchUnifiedFacts(slug, logSample) {
   const url = `${RAW_API_BASE}/school_facts_unified?school_id=eq.${slug}&select=field_key,field_label,display_value,value_numeric,unit`;
   const res = await fetchWithTimeout(url, { headers: RAW_HEADERS }).catch(() => null);
-  if (!res || !res.ok) return null;
+  if (!res || !res.ok) return [];
   const rows = await res.json();
 
   if (logSample) {
     console.log(
-      "\nSample school_facts_unified rows (for verifying international field name):\n",
+      "\nSample school_facts_unified rows (for verifying field names):\n",
       JSON.stringify(rows.slice(0, 5), null, 2).slice(0, 800),
       "\n"
     );
   }
+  return rows;
+}
 
+function deriveInternationalShare(rows) {
   const match = rows.find((r) =>
     /international|nonresident/i.test(r.field_label || "") || /international|nonresident/i.test(r.field_key || "")
   );
@@ -167,7 +173,29 @@ async function fetchInternationalShare(slug, logSample) {
   return { value: match.value_numeric, label: match.field_label, fieldKey: match.field_key };
 }
 
-function normalize(schoolId, schoolName, facts, meritAid, international, logTestOptionalSample) {
+// C7 "Basis for Selection" — every field we've confirmed so far
+// (c711_first_gen_factor, c712_legacy_factor, c713_geography_factor,
+// c714_state_residency_factor, c718_demonstrated_interest_factor) follows
+// the pattern "c7" + two digits + a descriptive suffix, matching the
+// standard CDS C7 table's fixed item order. Rather than guess the exact
+// suffix text for every item (risky — one wrong guess and that row just
+// silently never matches), we match on the reliable part: any field key
+// starting with c7 followed by two digits. Their own field_label gives us
+// a ready-made display label, so we don't need to guess those either.
+function deriveBasisForSelection(rows) {
+  const matches = rows.filter((r) => /^c7\d{2}/i.test(r.field_key || ""));
+  if (matches.length === 0) return null;
+
+  return matches
+    .sort((a, b) => a.field_key.localeCompare(b.field_key))
+    .map((r) => ({
+      key: r.field_key,
+      label: r.field_label || r.field_key,
+      value: r.display_value ?? null,
+    }));
+}
+
+function normalize(schoolId, schoolName, facts, meritAid, unifiedFactsRows, logTestOptionalSample) {
   if (!facts) {
     return { id: schoolId, name: schoolName, hasCdsData: false };
   }
@@ -196,7 +224,9 @@ function normalize(schoolId, schoolName, facts, meritAid, international, logTest
         avgAward: meritAid.avg_non_need_grant_first_year_ft,
       }
     : null;
+  const international = deriveInternationalShare(unifiedFactsRows);
   const internationalEnrollmentPct = international ? international.value : null;
+  const basisForSelection = deriveBasisForSelection(unifiedFactsRows);
   const testOptional = determineTestOptional(facts, logTestOptionalSample);
   // A link to the actual archived CDS document, when CollegeData.FYI
   // provides one — this is their own recorded source, not a guessed URL.
@@ -216,10 +246,10 @@ function normalize(schoolId, schoolName, facts, meritAid, international, logTest
   // publish a CDS. That data is still genuinely useful (it's what powers
   // the "where you stand" comparator) and shouldn't be discarded just
   // because it doesn't prove a CDS document exists.
-  const hasCdsData = [satComposite50, edOffered, eaOffered, waitlistOffered, meritAidResult].some((v) => v != null);
+  const hasCdsData = [satComposite50, edOffered, eaOffered, waitlistOffered, meritAidResult, basisForSelection].some((v) => v != null);
   const hasAnyData = [
     satComposite50, satComposite25, actComposite25, actComposite50,
-    edOffered, eaOffered, waitlistOffered, meritAidResult, internationalEnrollmentPct, testOptional,
+    edOffered, eaOffered, waitlistOffered, meritAidResult, internationalEnrollmentPct, testOptional, basisForSelection,
   ].some((v) => v != null);
 
   if (!hasAnyData) {
@@ -245,6 +275,7 @@ function normalize(schoolId, schoolName, facts, meritAid, international, logTest
     meritAid: meritAidResult,
     internationalEnrollmentPct,
     testOptional, // { status: "optional"|"required", confidence: "confirmed"|"inferred" } or null
+    basisForSelection, // [{ key, label, value }] or null — C7 table, raw display_value per factor
   };
 }
 
@@ -260,13 +291,13 @@ async function processSchool(school, loggedInternationalSampleRef) {
   const shouldLog = !loggedInternationalSampleRef.done;
   loggedInternationalSampleRef.done = true;
 
-  const [facts, meritAid, international] = await Promise.all([
+  const [facts, meritAid, unifiedFactsRows] = await Promise.all([
     fetchFacts(slug).catch(() => null),
     fetchMeritAid(slug).catch(() => null),
-    fetchInternationalShare(slug, shouldLog).catch(() => null),
+    fetchUnifiedFacts(slug, shouldLog).catch(() => []),
   ]);
 
-  return normalize(school.id, school.name, facts, meritAid, international, shouldLog);
+  return normalize(school.id, school.name, facts, meritAid, unifiedFactsRows, shouldLog);
 }
 
 // Runs schools with limited concurrency (CONCURRENCY at a time) instead of
