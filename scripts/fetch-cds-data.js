@@ -326,6 +326,27 @@ async function main() {
 
   console.log(`Fetching CDS data for ${schools.length} schools from CollegeData.FYI (concurrency: ${CONCURRENCY})...`);
 
+  // Targeted diagnostic: the general debug log fires on whichever school
+  // happens to process first, which could be a thin-data school with no
+  // real CDS on file at all — not a fair test of whether C7 exists in
+  // richer records. Test a well-known school we're confident has a full,
+  // real CDS document, so a negative result here actually means something.
+  console.log("\n--- Diagnostic: checking a known rich-data school (Harvard) for c7XX fields ---");
+  const harvardSlug = await findSlug("Harvard University", "harvard.edu");
+  if (harvardSlug) {
+    const harvardRows = await fetchUnifiedFacts(harvardSlug, false);
+    const harvardC7 = harvardRows.filter((r) => /^c7\d{2}/i.test(r.field_key || ""));
+    console.log(`Harvard: ${harvardRows.length} total rows, ${harvardC7.length} c7XX matches.`);
+    if (harvardC7.length > 0) {
+      console.log(JSON.stringify(harvardC7, null, 2).slice(0, 1500));
+    } else {
+      console.log("No c7XX fields found for Harvard either — this data likely isn't in this table at all.");
+    }
+  } else {
+    console.log("Could not find a slug for Harvard to test.");
+  }
+  console.log("--- End diagnostic ---\n");
+
   let completed = 0;
   let index = 0;
 
