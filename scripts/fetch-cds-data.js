@@ -331,17 +331,14 @@ async function main() {
   // real CDS on file at all — not a fair test of whether C7 exists in
   // richer records. Test a well-known school we're confident has a full,
   // real CDS document, so a negative result here actually means something.
-  console.log("\n--- Diagnostic: checking a known rich-data school (Harvard) for c7XX fields ---");
+  console.log("\n--- Diagnostic: dumping ALL of Harvard's fields (not filtering by any guessed pattern) ---");
   const harvardSlug = await findSlug("Harvard University", "harvard.edu");
   if (harvardSlug) {
     const harvardRows = await fetchUnifiedFacts(harvardSlug, false);
-    const harvardC7 = harvardRows.filter((r) => /^c7\d{2}/i.test(r.field_key || ""));
-    console.log(`Harvard: ${harvardRows.length} total rows, ${harvardC7.length} c7XX matches.`);
-    if (harvardC7.length > 0) {
-      console.log(JSON.stringify(harvardC7, null, 2).slice(0, 1500));
-    } else {
-      console.log("No c7XX fields found for Harvard either — this data likely isn't in this table at all.");
-    }
+    console.log(`Harvard: ${harvardRows.length} total fields. Listing every field_key + field_label pair:\n`);
+    harvardRows.forEach((r, i) => {
+      console.log(`  ${i + 1}. key="${r.field_key}"  label="${r.field_label}"`);
+    });
   } else {
     console.log("Could not find a slug for Harvard to test.");
   }
