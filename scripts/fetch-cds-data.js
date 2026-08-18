@@ -156,8 +156,19 @@ async function fetchUnifiedFacts(slug, logSample) {
   const rows = await res.json();
 
   if (logSample) {
+    // A random 5-row sample often misses relevant fields entirely on a
+    // school with dozens of rows — search the FULL list directly instead
+    // and report a definitive answer, rather than hoping the right field
+    // happens to land in a small preview slice.
+    const c7Matches = rows.filter((r) => /^c7\d{2}/i.test(r.field_key || ""));
+    console.log(`\nTotal school_facts_unified rows for this school: ${rows.length}`);
     console.log(
-      "\nSample school_facts_unified rows (for verifying field names):\n",
+      c7Matches.length > 0
+        ? `Found ${c7Matches.length} c7XX (Basis for Selection) fields:\n${JSON.stringify(c7Matches, null, 2).slice(0, 1500)}`
+        : "No c7XX-prefixed fields found anywhere in this school's data."
+    );
+    console.log(
+      "\nFirst 5 rows for general reference:\n",
       JSON.stringify(rows.slice(0, 5), null, 2).slice(0, 800),
       "\n"
     );
