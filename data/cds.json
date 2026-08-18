@@ -27366,7 +27366,26 @@
   "210429": {
     "id": 210429,
     "name": "Western Oregon University",
-    "hasCdsData": false
+    "hasCdsData": true,
+    "hasAnyData": true,
+    "satComposite50": null,
+    "satComposite25": 868,
+    "satComposite75": 1108,
+    "actComposite25": 21,
+    "actComposite50": 23,
+    "actComposite75": 26,
+    "edOffered": false,
+    "eaOffered": null,
+    "waitlistOffered": null,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": "https://www.collegedata.fyi/schools/western-oregon-university/2024-25",
+    "meritAid": null,
+    "internationalEnrollmentPct": null,
+    "testOptional": {
+      "status": "optional",
+      "confidence": "inferred"
+    },
+    "basisForSelection": null
   },
   "210438": {
     "id": 210438,
@@ -27376,29 +27395,62 @@
   "210492": {
     "id": 210492,
     "name": "Bryn Athyn College of the New Church",
-    "hasCdsData": false
+    "hasCdsData": false,
+    "hasAnyData": true,
+    "satComposite50": null,
+    "satComposite25": 1060,
+    "satComposite75": 1298,
+    "actComposite25": 27,
+    "actComposite50": null,
+    "actComposite75": 28,
+    "edOffered": null,
+    "eaOffered": null,
+    "waitlistOffered": null,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": null,
+    "meritAid": null,
+    "internationalEnrollmentPct": null,
+    "testOptional": null,
+    "basisForSelection": null
   },
   "210571": {
     "id": 210571,
     "name": "Albright College",
     "hasCdsData": false,
+    "hasAnyData": true,
     "testOptional": {
       "status": "optional",
       "confidence": "confirmed",
       "source": "FairTest"
-    },
-    "hasAnyData": true
+    }
   },
   "210669": {
     "id": 210669,
     "name": "Allegheny College",
-    "hasCdsData": false,
+    "hasCdsData": true,
+    "hasAnyData": true,
+    "satComposite50": 1260,
+    "satComposite25": 1173,
+    "satComposite75": 1358,
+    "actComposite25": 25,
+    "actComposite50": 29,
+    "actComposite75": 30,
+    "edOffered": true,
+    "eaOffered": true,
+    "waitlistOffered": 220,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": "https://www.collegedata.fyi/schools/allegheny-college/2025-26",
+    "meritAid": {
+      "recipientShare": 0.24516129032258063,
+      "avgAward": 36327.6
+    },
+    "internationalEnrollmentPct": null,
     "testOptional": {
       "status": "optional",
       "confidence": "confirmed",
       "source": "FairTest"
     },
-    "hasAnyData": true
+    "basisForSelection": null
   },
   "210739": {
     "id": 210739,
@@ -27457,23 +27509,51 @@
     "id": 211088,
     "name": "Arcadia University",
     "hasCdsData": false,
+    "hasAnyData": true,
+    "satComposite50": null,
+    "satComposite25": 1065,
+    "satComposite75": 1265,
+    "actComposite25": 26,
+    "actComposite50": 28,
+    "actComposite75": 30,
+    "edOffered": null,
+    "eaOffered": null,
+    "waitlistOffered": null,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": "https://www.collegedata.fyi/schools/arcadia-university/2023-24",
+    "meritAid": null,
+    "internationalEnrollmentPct": null,
     "testOptional": {
       "status": "optional",
       "confidence": "confirmed",
       "source": "FairTest"
     },
-    "hasAnyData": true
+    "basisForSelection": null
   },
   "211273": {
     "id": 211273,
     "name": "Bryn Mawr College",
-    "hasCdsData": false,
+    "hasCdsData": true,
+    "hasAnyData": true,
+    "satComposite50": 1400,
+    "satComposite25": 1280,
+    "satComposite75": 1510,
+    "actComposite25": 29,
+    "actComposite50": 31,
+    "actComposite75": 33,
+    "edOffered": false,
+    "eaOffered": null,
+    "waitlistOffered": 494,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": "https://www.collegedata.fyi/schools/bryn-mawr-college/2024-25",
+    "meritAid": null,
+    "internationalEnrollmentPct": null,
     "testOptional": {
       "status": "optional",
       "confidence": "confirmed",
       "source": "FairTest"
     },
-    "hasAnyData": true
+    "basisForSelection": null
   },
   "211291": {
     "id": 211291,
@@ -27507,12 +27587,26 @@
     "id": 211431,
     "name": "Carlow University",
     "hasCdsData": false,
+    "hasAnyData": true,
+    "satComposite50": null,
+    "satComposite25": 960,
+    "satComposite75": 1168,
+    "actComposite25": 21,
+    "actComposite50": null,
+    "actComposite75": 24,
+    "edOffered": null,
+    "eaOffered": null,
+    "waitlistOffered": null,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": null,
+    "meritAid": null,
+    "internationalEnrollmentPct": null,
     "testOptional": {
       "status": "optional",
       "confidence": "confirmed",
       "source": "FairTest"
     },
-    "hasAnyData": true
+    "basisForSelection": null
   },
   "211440": {
     "id": 211440,
@@ -27542,18 +27636,48 @@
   "211468": {
     "id": 211468,
     "name": "Cedar Crest College",
-    "hasCdsData": false
+    "hasCdsData": false,
+    "hasAnyData": true,
+    "satComposite50": null,
+    "satComposite25": 1000,
+    "satComposite75": 1230,
+    "actComposite25": 20,
+    "actComposite50": null,
+    "actComposite75": 29,
+    "edOffered": null,
+    "eaOffered": null,
+    "waitlistOffered": null,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": null,
+    "meritAid": null,
+    "internationalEnrollmentPct": null,
+    "testOptional": null,
+    "basisForSelection": null
   },
   "211477": {
     "id": 211477,
     "name": "Central Penn College",
     "hasCdsData": false,
+    "hasAnyData": true,
+    "satComposite50": null,
+    "satComposite25": 660,
+    "satComposite75": 910,
+    "actComposite25": 13,
+    "actComposite50": null,
+    "actComposite75": 17,
+    "edOffered": null,
+    "eaOffered": null,
+    "waitlistOffered": null,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": null,
+    "meritAid": null,
+    "internationalEnrollmentPct": null,
     "testOptional": {
       "status": "optional",
       "confidence": "confirmed",
       "source": "FairTest"
     },
-    "hasAnyData": true
+    "basisForSelection": null
   },
   "211556": {
     "id": 211556,
@@ -27584,12 +27708,26 @@
     "id": 211583,
     "name": "Chestnut Hill College",
     "hasCdsData": false,
+    "hasAnyData": true,
+    "satComposite50": null,
+    "satComposite25": 900,
+    "satComposite75": 1090,
+    "actComposite25": 16,
+    "actComposite50": null,
+    "actComposite75": 20,
+    "edOffered": null,
+    "eaOffered": null,
+    "waitlistOffered": null,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": null,
+    "meritAid": null,
+    "internationalEnrollmentPct": null,
     "testOptional": {
       "status": "optional",
       "confidence": "confirmed",
       "source": "FairTest"
     },
-    "hasAnyData": true
+    "basisForSelection": null
   },
   "211608": {
     "id": 211608,
@@ -27601,34 +27739,65 @@
     "id": 211893,
     "name": "Curtis Institute of Music",
     "hasCdsData": false,
+    "hasAnyData": true,
     "testOptional": {
       "status": "optional",
       "confidence": "confirmed",
       "source": "FairTest"
-    },
-    "hasAnyData": true
+    }
   },
   "211981": {
     "id": 211981,
     "name": "Delaware Valley University",
     "hasCdsData": false,
+    "hasAnyData": true,
+    "satComposite50": null,
+    "satComposite25": 1090,
+    "satComposite75": 1303,
+    "actComposite25": 23,
+    "actComposite50": 27,
+    "actComposite75": 30,
+    "edOffered": null,
+    "eaOffered": null,
+    "waitlistOffered": null,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": null,
+    "meritAid": null,
+    "internationalEnrollmentPct": null,
     "testOptional": {
       "status": "optional",
       "confidence": "confirmed",
       "source": "FairTest"
     },
-    "hasAnyData": true
+    "basisForSelection": null
   },
   "212009": {
     "id": 212009,
     "name": "Dickinson College",
-    "hasCdsData": false,
+    "hasCdsData": true,
+    "hasAnyData": true,
+    "satComposite50": 1380,
+    "satComposite25": 1310,
+    "satComposite75": 1460,
+    "actComposite25": 30,
+    "actComposite50": 32,
+    "actComposite75": 33,
+    "edOffered": true,
+    "eaOffered": false,
+    "waitlistOffered": 252,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": "https://www.collegedata.fyi/schools/dickinson-college/2024-25",
+    "meritAid": {
+      "recipientShare": 1.0448916408668731,
+      "avgAward": 32586
+    },
+    "internationalEnrollmentPct": null,
     "testOptional": {
       "status": "optional",
       "confidence": "confirmed",
       "source": "FairTest"
     },
-    "hasAnyData": true
+    "basisForSelection": null
   },
   "212054": {
     "id": 212054,
@@ -27686,29 +27855,73 @@
   "212115": {
     "id": 212115,
     "name": "East Stroudsburg University of Pennsylvania",
-    "hasCdsData": false
+    "hasCdsData": false,
+    "hasAnyData": true,
+    "satComposite50": null,
+    "satComposite25": 1000,
+    "satComposite75": 1180,
+    "actComposite25": 22,
+    "actComposite50": 23,
+    "actComposite75": 23,
+    "edOffered": null,
+    "eaOffered": null,
+    "waitlistOffered": null,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": null,
+    "meritAid": null,
+    "internationalEnrollmentPct": null,
+    "testOptional": null,
+    "basisForSelection": null
   },
   "212133": {
     "id": 212133,
     "name": "Eastern University",
     "hasCdsData": false,
+    "hasAnyData": true,
+    "satComposite50": null,
+    "satComposite25": 1010,
+    "satComposite75": 1190,
+    "actComposite25": 20,
+    "actComposite50": null,
+    "actComposite75": 24,
+    "edOffered": null,
+    "eaOffered": null,
+    "waitlistOffered": null,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": "https://www.collegedata.fyi/schools/eastern-university/2022-23",
+    "meritAid": null,
+    "internationalEnrollmentPct": null,
     "testOptional": {
       "status": "optional",
       "confidence": "confirmed",
       "source": "FairTest"
     },
-    "hasAnyData": true
+    "basisForSelection": null
   },
   "212197": {
     "id": 212197,
     "name": "Elizabethtown College",
     "hasCdsData": false,
+    "hasAnyData": true,
+    "satComposite50": null,
+    "satComposite25": 1105,
+    "satComposite75": 1310,
+    "actComposite25": 26,
+    "actComposite50": 27,
+    "actComposite75": 31,
+    "edOffered": null,
+    "eaOffered": null,
+    "waitlistOffered": null,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": null,
+    "meritAid": null,
+    "internationalEnrollmentPct": null,
     "testOptional": {
       "status": "optional",
       "confidence": "confirmed",
       "source": "FairTest"
     },
-    "hasAnyData": true
+    "basisForSelection": null
   },
   "212577": {
     "id": 212577,
@@ -27742,12 +27955,26 @@
     "id": 212601,
     "name": "Gannon University",
     "hasCdsData": false,
+    "hasAnyData": true,
+    "satComposite50": null,
+    "satComposite25": 990,
+    "satComposite75": 1250,
+    "actComposite25": 20,
+    "actComposite50": null,
+    "actComposite75": 28,
+    "edOffered": null,
+    "eaOffered": null,
+    "waitlistOffered": null,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": null,
+    "meritAid": null,
+    "internationalEnrollmentPct": null,
     "testOptional": {
       "status": "optional",
       "confidence": "confirmed",
       "source": "FairTest"
     },
-    "hasAnyData": true
+    "basisForSelection": null
   },
   "212656": {
     "id": 212656,
@@ -27861,13 +28088,30 @@
   "212911": {
     "id": 212911,
     "name": "Haverford College",
-    "hasCdsData": false,
+    "hasCdsData": true,
+    "hasAnyData": true,
+    "satComposite50": 1490,
+    "satComposite25": 1460,
+    "satComposite75": 1550,
+    "actComposite25": 33,
+    "actComposite50": 34,
+    "actComposite75": 35,
+    "edOffered": true,
+    "eaOffered": false,
+    "waitlistOffered": 1342,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": "https://www.collegedata.fyi/schools/haverford-college/2025-26",
+    "meritAid": {
+      "recipientShare": 0,
+      "avgAward": 0
+    },
+    "internationalEnrollmentPct": null,
     "testOptional": {
       "status": "optional",
       "confidence": "confirmed",
       "source": "FairTest"
     },
-    "hasAnyData": true
+    "basisForSelection": null
   },
   "212984": {
     "id": 212984,
