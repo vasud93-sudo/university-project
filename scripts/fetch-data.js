@@ -48,7 +48,15 @@ const TOP_PROGRAMS_PER_SCHOOL = 10;
 // so the filtered list stays useful instead of huge.
 const FILTERS = [
   "school.operating=1",
-  "school.degrees_awarded.predominant=3", // predominantly bachelor's-degree granting
+  // Broadened from predominant=3 (bachelor's is the MAIN degree type) to
+  // highest__range=3..4 (school's highest degree is bachelor's OR
+  // graduate) — this catches schools that have grown mostly into graduate
+  // institutions but still offer real undergrad programs. This alone
+  // would also let in true graduate-only schools (law/med schools with
+  // zero undergrad), so main() additionally drops any school that comes
+  // back with no actual bachelor's-level majors — see the hasBachelors
+  // check below.
+  "school.degrees_awarded.highest__range=3..4",
 ].join("&");
 
 const PER_PAGE = 100;
@@ -161,9 +169,19 @@ async function main() {
     await new Promise((r) => setTimeout(r, 150));
   }
 
+  // The broadened API filter (highest__range=3..4) also lets in true
+  // graduate-only schools with zero undergrad programs (standalone law
+  // schools, med schools, etc.) — drop any school with no actual
+  // bachelor's-level majors in the data we already pulled, rather than
+  // trusting the API's "highest degree" field alone to guarantee real
+  // undergrad offerings.
+  const beforeCount = results.length;
+  const withBachelors = results.filter((s) => s.topPrograms && s.topPrograms.length > 0);
+  console.log(`\nDropped ${beforeCount - withBachelors.length} schools with no bachelor's-level programs (graduate-only).`);
+
   const outPath = path.join(__dirname, "..", "data", "schools.json");
-  fs.writeFileSync(outPath, JSON.stringify(results, null, 2));
-  console.log(`\nSaved ${results.length} schools to ${outPath}`);
+  fs.writeFileSync(outPath, JSON.stringify(withBachelors, null, 2));
+  console.log(`Saved ${withBachelors.length} schools to ${outPath}`);
 }
 
 main().catch((err) => {
