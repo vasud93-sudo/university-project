@@ -29,6 +29,7 @@ async function init() {
     renderInternational(cdsRecord);
     renderAdmissionStrategy(cdsRecord); // internally checks its own fields; hides itself if none are present
     renderComparator(cdsRecord); // internally checks SAT/ACT presence; works even without a full CDS document
+    renderBasisForSelection(cdsRecord); // internally checks its own field; hides itself if not present
   } else {
     document.getElementById("no-cds-section").hidden = false;
   }
@@ -208,6 +209,54 @@ function setupComparator() {
 
   input.oninput = render;
   render();
+}
+
+// Maps whatever text CollegeData.FYI's display_value contains to one of
+// the four standard CDS C7 importance columns. We don't know the exact
+// wording their system uses ahead of time, so this matches loosely
+// (case-insensitive, substring) rather than requiring an exact string —
+// safer than an exact match that silently fails on a wording difference,
+// same lesson as every other field we've had to debug in this project.
+// Anything that doesn't match a known column is shown as raw text instead
+// of being dropped, so a wording mismatch is visible rather than silent.
+const BASIS_COLUMNS = ["Very Important", "Important", "Considered", "Not Considered"];
+function matchBasisColumn(value) {
+  if (!value) return null;
+  const v = String(value).toLowerCase();
+  if (/very.?important/.test(v)) return "Very Important";
+  if (/not.?considered/.test(v)) return "Not Considered";
+  if (/important/.test(v)) return "Important";
+  if (/considered/.test(v)) return "Considered";
+  return null;
+}
+
+function renderBasisForSelection(cds) {
+  const section = document.getElementById("basis-section");
+  const rows = cds.basisForSelection;
+  if (!rows || rows.length === 0) {
+    section.hidden = true;
+    return;
+  }
+
+  const header = `
+    <tr>
+      <th class="basis-measure-head">Measure</th>
+      ${BASIS_COLUMNS.map((c) => `<th>${escapeHtml(c)}</th>`).join("")}
+    </tr>`;
+
+  const body = rows
+    .map((r) => {
+      const matched = matchBasisColumn(r.value);
+      const cells = BASIS_COLUMNS.map((c) => `<td>${c === matched ? "Yes" : "—"}</td>`).join("");
+      // If we couldn't match any known column, show the raw value in the
+      // Measure cell instead of silently losing it.
+      const measureLabel = matched ? escapeHtml(r.label) : `${escapeHtml(r.label)} <span class="basis-raw-value">(${escapeHtml(r.value)})</span>`;
+      return `<tr><td class="basis-measure">${measureLabel}</td>${cells}</tr>`;
+    })
+    .join("");
+
+  document.getElementById("basis-table").innerHTML = header + body;
+  section.hidden = false;
 }
 
 init();
