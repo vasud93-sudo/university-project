@@ -152,6 +152,125 @@ a { color: var(--library-green); }
   outline-offset: 1px;
 }
 
+/* ---------- Major multi-select dropdown ---------- */
+
+.major-dropdown {
+  position: relative;
+}
+
+.major-dropdown summary {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  padding: 7px 30px 7px 10px;
+  border: 1px solid var(--library-green-dark);
+  border-radius: 2px;
+  background: var(--card);
+  color: var(--ink);
+  min-width: 160px;
+  cursor: pointer;
+  list-style: none;
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.major-dropdown summary::-webkit-details-marker { display: none; }
+
+.major-dropdown summary::after {
+  content: "▾";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--library-green-dark);
+}
+
+.major-dropdown[open] summary::after {
+  content: "▴";
+}
+
+.major-panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 20;
+  background: var(--card);
+  border: 1px solid var(--library-green-dark);
+  border-radius: 3px;
+  box-shadow: 2px 4px 10px var(--shadow);
+  width: 280px;
+  max-width: 80vw;
+  padding: 10px;
+}
+
+#major-search {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 0.84rem;
+  padding: 6px 8px;
+  border: 1px solid var(--brass);
+  border-radius: 2px;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+}
+
+.major-checkbox-list {
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.major-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 0.84rem;
+  color: var(--ink);
+  padding: 5px 4px;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.major-checkbox-row:hover {
+  background: var(--paper);
+}
+
+.major-checkbox-row input {
+  accent-color: var(--stamp-red);
+  flex-shrink: 0;
+}
+
+.major-no-results {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  text-align: center;
+  padding: 10px 0;
+  margin: 0;
+}
+
+.major-clear-btn {
+  width: 100%;
+  margin-top: 8px;
+  padding: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  background: none;
+  border: 1px solid var(--brass);
+  border-radius: 2px;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.major-clear-btn:hover {
+  border-color: var(--stamp-red);
+  color: var(--stamp-red);
+}
+
 /* ---------- Main / results ---------- */
 
 .priority-panel {

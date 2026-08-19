@@ -38,8 +38,15 @@
       <select id="f-state"><option value="">All states</option></select>
     </div>
     <div class="filter-tab">
-      <label for="f-major">Major</label>
-      <select id="f-major"><option value="">Any major</option></select>
+      <label id="major-filter-label">Major</label>
+      <details class="major-dropdown" id="major-dropdown">
+        <summary id="major-summary">Any major</summary>
+        <div class="major-panel">
+          <input type="text" id="major-search" placeholder="Search majors…" autocomplete="off" />
+          <div class="major-checkbox-list" id="major-checkbox-list"></div>
+          <button type="button" id="major-clear" class="major-clear-btn">Clear selection</button>
+        </div>
+      </details>
     </div>
     <div class="filter-tab">
       <label for="f-ownership">Type</label>

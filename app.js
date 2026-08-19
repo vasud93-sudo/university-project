@@ -2,13 +2,18 @@ const STORAGE_KEY = "uni-catalog-shortlist";
 
 let schools = [];
 let cdsIds = new Set(); // ids of schools that have CDS data available
+let selectedMajors = new Set(); // multi-select: schools matching ANY selected major pass the filter
 let cdsData = {}; // full CDS records, keyed by school id — used for priority scoring
 let shortlistIds = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"));
 
 const els = {
   search: document.getElementById("f-search"),
   state: document.getElementById("f-state"),
-  major: document.getElementById("f-major"),
+  majorDropdown: document.getElementById("major-dropdown"),
+  majorSummary: document.getElementById("major-summary"),
+  majorSearch: document.getElementById("major-search"),
+  majorCheckboxList: document.getElementById("major-checkbox-list"),
+  majorClear: document.getElementById("major-clear"),
   ownership: document.getElementById("f-ownership"),
   tuition: document.getElementById("f-tuition"),
   admit: document.getElementById("f-admit"),
@@ -69,12 +74,55 @@ function populateStateFilter() {
 
 function populateMajorFilter() {
   const majors = [...new Set(schools.flatMap((s) => (s.topPrograms || []).map((p) => p.title)))].sort();
-  for (const major of majors) {
-    const opt = document.createElement("option");
-    opt.value = major;
-    opt.textContent = major;
-    els.major.appendChild(opt);
-  }
+  renderMajorCheckboxes(majors);
+
+  els.majorSearch.addEventListener("input", () => {
+    const q = els.majorSearch.value.trim().toLowerCase();
+    const filtered = q ? majors.filter((m) => m.toLowerCase().includes(q)) : majors;
+    renderMajorCheckboxes(filtered);
+  });
+
+  els.majorClear.addEventListener("click", (e) => {
+    e.preventDefault();
+    selectedMajors.clear();
+    updateMajorSummary();
+    renderMajorCheckboxes(majors); // re-render so checkmarks clear too
+    render();
+  });
+
+  // Close the dropdown when clicking outside it — <details> alone leaves
+  // it open until the summary is clicked again, which feels stuck.
+  document.addEventListener("click", (e) => {
+    if (els.majorDropdown.open && !els.majorDropdown.contains(e.target)) {
+      els.majorDropdown.open = false;
+    }
+  });
+}
+
+function renderMajorCheckboxes(majorList) {
+  els.majorCheckboxList.innerHTML = majorList
+    .map(
+      (m) => `
+      <label class="major-checkbox-row">
+        <input type="checkbox" value="${escapeHtml(m)}" ${selectedMajors.has(m) ? "checked" : ""} />
+        <span>${escapeHtml(m)}</span>
+      </label>`
+    )
+    .join("") || `<p class="major-no-results">No majors match your search.</p>`;
+
+  els.majorCheckboxList.querySelectorAll("input[type=checkbox]").forEach((cb) => {
+    cb.addEventListener("change", () => {
+      if (cb.checked) selectedMajors.add(cb.value);
+      else selectedMajors.delete(cb.value);
+      updateMajorSummary();
+      render();
+    });
+  });
+}
+
+function updateMajorSummary() {
+  const n = selectedMajors.size;
+  els.majorSummary.textContent = n === 0 ? "Any major" : n === 1 ? [...selectedMajors][0] : `${n} majors selected`;
 }
 
 // Priority weighting for the "My priorities" sort mode. Each factor's
@@ -118,7 +166,7 @@ function getPriorityWeights() {
 }
 
 function bindEvents() {
-  [els.search, els.state, els.major, els.ownership, els.tuition, els.admit, els.cds, els.testOptional, els.sort].forEach((el) =>
+  [els.search, els.state, els.ownership, els.tuition, els.admit, els.cds, els.testOptional, els.sort].forEach((el) =>
     el.addEventListener("input", () => {
       els.priorityPanel.hidden = els.sort.value !== "priority";
       render();
@@ -148,7 +196,6 @@ function setDrawer(open) {
 function getFiltered() {
   const q = els.search.value.trim().toLowerCase();
   const state = els.state.value;
-  const major = els.major.value;
   const ownership = els.ownership.value;
   const maxTuition = els.tuition.value ? Number(els.tuition.value) : null;
   const minAdmit = els.admit.value ? Number(els.admit.value) : null;
@@ -158,7 +205,7 @@ function getFiltered() {
   let list = schools.filter((s) => {
     if (q && !`${s.name} ${s.city}`.toLowerCase().includes(q)) return false;
     if (state && s.state !== state) return false;
-    if (major && !(s.topPrograms || []).some((p) => p.title === major)) return false;
+    if (selectedMajors.size > 0 && !(s.topPrograms || []).some((p) => selectedMajors.has(p.title))) return false;
     if (ownership && s.ownership !== ownership) return false;
     if (maxTuition != null && (s.tuitionOutOfState == null || s.tuitionOutOfState > maxTuition)) return false;
     if (minAdmit != null && (s.admissionRate == null || s.admissionRate < minAdmit)) return false;
