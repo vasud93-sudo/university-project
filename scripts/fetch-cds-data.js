@@ -335,10 +335,25 @@ async function main() {
   const harvardSlug = await findSlug("Harvard University", "harvard.edu");
   if (harvardSlug) {
     const harvardRows = await fetchUnifiedFacts(harvardSlug, false);
-    console.log(`Harvard: ${harvardRows.length} total fields. Listing every field_key + field_label pair:\n`);
+    console.log(`Harvard: ${harvardRows.length} total fields from school_facts_unified. Listing every field_key + field_label pair:\n`);
     harvardRows.forEach((r, i) => {
       console.log(`  ${i + 1}. key="${r.field_key}"  label="${r.field_label}"`);
     });
+
+    // Also dump the OTHER endpoint we already use for ed_offered/ea_offered/
+    // waitlist — the "_factor" fields spotted earlier may actually live
+    // here, not in school_facts_unified, and we've only ever read a
+    // handful of specific keys from it, never the full raw list.
+    console.log("\n--- Also dumping ALL fields from the /facts?categories=admissions endpoint ---");
+    const harvardFacts = await fetchFacts(harvardSlug);
+    if (harvardFacts && Array.isArray(harvardFacts.facts)) {
+      console.log(`Harvard: ${harvardFacts.facts.length} total fields from /facts admissions. Listing every key + label pair:\n`);
+      harvardFacts.facts.forEach((f, i) => {
+        console.log(`  ${i + 1}. key="${f.key}"  label="${f.label}"`);
+      });
+    } else {
+      console.log("No facts array returned from /facts endpoint.");
+    }
   } else {
     console.log("Could not find a slug for Harvard to test.");
   }
