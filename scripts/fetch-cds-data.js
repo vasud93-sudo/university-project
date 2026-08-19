@@ -142,13 +142,11 @@ async function fetchMeritAid(slug) {
 }
 
 // International (nonresident-alien, the federal IPEDS category) enrollment
+// International (nonresident-alien, the federal IPEDS category) enrollment
 // share. The exact field_key isn't confirmed ahead of time, so instead of
 // guessing one key, we pull every fact for the school and search by label
 // text — more resilient to naming differences, and logs what it found (or
 // didn't) so a mismatch is easy to diagnose from the Action run log.
-// Both international enrollment share and the C7 "Basis for Selection"
-// table live in the same broad facts table, so we fetch it once per
-// school and derive both from it — one request instead of two.
 async function fetchUnifiedFacts(slug, logSample) {
   const url = `${RAW_API_BASE}/school_facts_unified?school_id=eq.${slug}&select=field_key,field_label,display_value,value_numeric,unit`;
   const res = await fetchWithTimeout(url, { headers: RAW_HEADERS }).catch(() => null);
@@ -156,19 +154,8 @@ async function fetchUnifiedFacts(slug, logSample) {
   const rows = await res.json();
 
   if (logSample) {
-    // A random 5-row sample often misses relevant fields entirely on a
-    // school with dozens of rows — search the FULL list directly instead
-    // and report a definitive answer, rather than hoping the right field
-    // happens to land in a small preview slice.
-    const c7Matches = rows.filter((r) => /^c7\d{2}/i.test(r.field_key || ""));
-    console.log(`\nTotal school_facts_unified rows for this school: ${rows.length}`);
     console.log(
-      c7Matches.length > 0
-        ? `Found ${c7Matches.length} c7XX (Basis for Selection) fields:\n${JSON.stringify(c7Matches, null, 2).slice(0, 1500)}`
-        : "No c7XX-prefixed fields found anywhere in this school's data."
-    );
-    console.log(
-      "\nFirst 5 rows for general reference:\n",
+      "\nSample school_facts_unified rows (for verifying international field name):\n",
       JSON.stringify(rows.slice(0, 5), null, 2).slice(0, 800),
       "\n"
     );
@@ -184,27 +171,18 @@ function deriveInternationalShare(rows) {
   return { value: match.value_numeric, label: match.field_label, fieldKey: match.field_key };
 }
 
-// C7 "Basis for Selection" — every field we've confirmed so far
-// (c711_first_gen_factor, c712_legacy_factor, c713_geography_factor,
-// c714_state_residency_factor, c718_demonstrated_interest_factor) follows
-// the pattern "c7" + two digits + a descriptive suffix, matching the
-// standard CDS C7 table's fixed item order. Rather than guess the exact
-// suffix text for every item (risky — one wrong guess and that row just
-// silently never matches), we match on the reliable part: any field key
-// starting with c7 followed by two digits. Their own field_label gives us
-// a ready-made display label, so we don't need to guess those either.
-function deriveBasisForSelection(rows) {
-  const matches = rows.filter((r) => /^c7\d{2}/i.test(r.field_key || ""));
-  if (matches.length === 0) return null;
-
-  return matches
-    .sort((a, b) => a.field_key.localeCompare(b.field_key))
-    .map((r) => ({
-      key: r.field_key,
-      label: r.field_label || r.field_key,
-      value: r.display_value ?? null,
-    }));
-}
+// NOTE: We tried adding CDS Section C7 "Basis for Selection" data here
+// (rigor, class rank, GPA weighting, recommendations, legacy, demonstrated
+// interest, etc.) based on field names like "c711_first_gen_factor" spotted
+// earlier — but that assumption was wrong. A full dump of every field
+// CollegeData.FYI returns for Harvard (a school with confirmed rich CDS
+// data), across both school_facts_unified (62 fields) and the
+// /facts?categories=admissions endpoint (32 fields), confirmed NO field
+// resembling C7 content exists in either place. The "c7XX" naming was
+// likely a confusion between CDS's own official item-numbering scheme and
+// CollegeData.FYI's actual internal field names, which don't follow that
+// pattern at all. This data isn't available from this source — don't
+// re-attempt without a different, verified data source.
 
 function normalize(schoolId, schoolName, facts, meritAid, unifiedFactsRows, logTestOptionalSample) {
   if (!facts) {
@@ -237,7 +215,6 @@ function normalize(schoolId, schoolName, facts, meritAid, unifiedFactsRows, logT
     : null;
   const international = deriveInternationalShare(unifiedFactsRows);
   const internationalEnrollmentPct = international ? international.value : null;
-  const basisForSelection = deriveBasisForSelection(unifiedFactsRows);
   const testOptional = determineTestOptional(facts, logTestOptionalSample);
   // A link to the actual archived CDS document, when CollegeData.FYI
   // provides one — this is their own recorded source, not a guessed URL.
@@ -257,10 +234,10 @@ function normalize(schoolId, schoolName, facts, meritAid, unifiedFactsRows, logT
   // publish a CDS. That data is still genuinely useful (it's what powers
   // the "where you stand" comparator) and shouldn't be discarded just
   // because it doesn't prove a CDS document exists.
-  const hasCdsData = [satComposite50, edOffered, eaOffered, waitlistOffered, meritAidResult, basisForSelection].some((v) => v != null);
+  const hasCdsData = [satComposite50, edOffered, eaOffered, waitlistOffered, meritAidResult].some((v) => v != null);
   const hasAnyData = [
     satComposite50, satComposite25, actComposite25, actComposite50,
-    edOffered, eaOffered, waitlistOffered, meritAidResult, internationalEnrollmentPct, testOptional, basisForSelection,
+    edOffered, eaOffered, waitlistOffered, meritAidResult, internationalEnrollmentPct, testOptional,
   ].some((v) => v != null);
 
   if (!hasAnyData) {
@@ -286,7 +263,6 @@ function normalize(schoolId, schoolName, facts, meritAid, unifiedFactsRows, logT
     meritAid: meritAidResult,
     internationalEnrollmentPct,
     testOptional, // { status: "optional"|"required", confidence: "confirmed"|"inferred" } or null
-    basisForSelection, // [{ key, label, value }] or null — C7 table, raw display_value per factor
   };
 }
 
@@ -325,39 +301,6 @@ async function main() {
   const loggedInternationalSampleRef = { done: false };
 
   console.log(`Fetching CDS data for ${schools.length} schools from CollegeData.FYI (concurrency: ${CONCURRENCY})...`);
-
-  // Targeted diagnostic: the general debug log fires on whichever school
-  // happens to process first, which could be a thin-data school with no
-  // real CDS on file at all — not a fair test of whether C7 exists in
-  // richer records. Test a well-known school we're confident has a full,
-  // real CDS document, so a negative result here actually means something.
-  console.log("\n--- Diagnostic: dumping ALL of Harvard's fields (not filtering by any guessed pattern) ---");
-  const harvardSlug = await findSlug("Harvard University", "harvard.edu");
-  if (harvardSlug) {
-    const harvardRows = await fetchUnifiedFacts(harvardSlug, false);
-    console.log(`Harvard: ${harvardRows.length} total fields from school_facts_unified. Listing every field_key + field_label pair:\n`);
-    harvardRows.forEach((r, i) => {
-      console.log(`  ${i + 1}. key="${r.field_key}"  label="${r.field_label}"`);
-    });
-
-    // Also dump the OTHER endpoint we already use for ed_offered/ea_offered/
-    // waitlist — the "_factor" fields spotted earlier may actually live
-    // here, not in school_facts_unified, and we've only ever read a
-    // handful of specific keys from it, never the full raw list.
-    console.log("\n--- Also dumping ALL fields from the /facts?categories=admissions endpoint ---");
-    const harvardFacts = await fetchFacts(harvardSlug);
-    if (harvardFacts && Array.isArray(harvardFacts.facts)) {
-      console.log(`Harvard: ${harvardFacts.facts.length} total fields from /facts admissions. Listing every key + label pair:\n`);
-      harvardFacts.facts.forEach((f, i) => {
-        console.log(`  ${i + 1}. key="${f.key}"  label="${f.label}"`);
-      });
-    } else {
-      console.log("No facts array returned from /facts endpoint.");
-    }
-  } else {
-    console.log("Could not find a slug for Harvard to test.");
-  }
-  console.log("--- End diagnostic ---\n");
 
   let completed = 0;
   let index = 0;
