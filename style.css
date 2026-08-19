@@ -917,60 +917,6 @@ main {
   margin: 0;
 }
 
-/* ---------- Basis for selection (CDS C7) ---------- */
-
-.basis-subtitle {
-  font-family: var(--font-body);
-  font-size: 0.84rem;
-  color: var(--ink-soft);
-  margin: 0 0 16px;
-}
-
-.basis-table-wrap {
-  overflow-x: auto;
-}
-
-.basis-table {
-  border-collapse: collapse;
-  width: 100%;
-  font-size: 0.84rem;
-}
-
-.basis-table th {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: var(--ink-soft);
-  text-align: center;
-  padding: 8px 10px;
-  border-bottom: 1px solid var(--brass);
-  white-space: nowrap;
-}
-
-.basis-measure-head {
-  text-align: left !important;
-}
-
-.basis-table td {
-  padding: 9px 10px;
-  border-bottom: 1px dashed var(--brass-line);
-  text-align: center;
-  color: var(--ink);
-}
-
-.basis-measure {
-  text-align: left !important;
-  font-family: var(--font-body);
-  color: var(--ink);
-}
-
-.basis-raw-value {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--stamp-red);
-}
-
 /* ---------- Footer ---------- */
 
 .method-text {
