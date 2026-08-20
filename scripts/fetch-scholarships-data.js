@@ -1,0 +1,234 @@
+// Pulls Bachelor's-level scholarships from EducationUSA
+// (educationusa.state.gov) — the US Department of State's own official
+// resource for international students. This is the highest-authenticity
+// source used anywhere in this project: a real .gov domain, not a
+// third-party aggregator.
+//
+// Scope: Bachelor's degree level only (field_scholarship_degree_levels_tid=16
+// — confirmed against the live site's own filter, which marked this exact
+// value as "Undergraduate - Bachelor's").
+//
+// IMPORTANT CAVEAT: unlike our other fetch scripts, this one was built
+// without ever seeing the site's raw HTML source — only an auto-converted
+// text rendering of it. The parsing logic here is a best-effort guess at
+// the real markup, using known, directly-observed LABEL TEXT (e.g.
+// "Location", "Scholarship Deadline") rather than guessed CSS class names,
+// since label text is far more likely to survive unchanged than internal
+// class names. Still, treat this as needing one debug-and-fix pass once
+// run for real — same as almost every other source in this project.
+//
+// Usage:
+//   node scripts/fetch-scholarships-data.js
+
+const fs = require("fs");
+const path = require("path");
+
+const BASE_URL = "https://educationusa.state.gov";
+const LISTING_URL = `${BASE_URL}/find-financial-aid`;
+const BACHELORS_DEGREE_LEVEL_TID = 16; // confirmed against the live site's own filter
+const RESULTS_PER_PAGE = 10; // observed from the site's own "Showing X - Y" text
+const CLIENT_HEADERS = {
+  "User-Agent": "us-university-catalog (student project; free scholarship listing for international students)",
+};
+
+async function fetchWithTimeout(url, options = {}, timeoutMs = 10000) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal, headers: CLIENT_HEADERS });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+// Converts raw HTML to plain text while preserving line breaks at block
+// element boundaries — critical so "Location" and "Albania" don't get
+// concatenated into "LocationAlbania" once tags are stripped.
+function htmlToText(html) {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<(br|\/div|\/p|\/li|\/h[1-6]|\/tr)\s*\/?>/gi, "\n")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&#039;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&nbsp;/g, " ")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n[ \t]*\n+/g, "\n")
+    .trim();
+}
+
+// Finds every scholarship link + category tag on one listing page. Titles
+// on this site link to paths like /scholarships/some-slug or /node/1234 —
+// this pattern is unlikely to change even if visual markup does.
+function parseListingPage(html) {
+  const results = [];
+  const linkPattern = /<a[^>]+href="((?:https:\/\/educationusa\.state\.gov)?\/(?:scholarships\/[a-z0-9-]+|node\/\d+))"[^>]*>([^<]+)<\/a>/gi;
+  let match;
+  const seen = new Set();
+  while ((match = linkPattern.exec(html)) !== null) {
+    const url = match[1].startsWith("http") ? match[1] : BASE_URL + match[1];
+    const title = match[2].trim();
+    // Skip nav/footer links that happen to match the URL pattern but
+    // aren't real scholarship titles (e.g. "Read more", empty text).
+    if (!title || title.length < 4 || /^read more$/i.test(title)) continue;
+    if (seen.has(url)) continue;
+    seen.add(url);
+    results.push({ url, title });
+  }
+  return results;
+}
+
+// Known field labels this site uses on every scholarship's detail page,
+// directly observed rather than guessed. Extraction grabs the text after
+// a label up to whichever known label (or a length cap) comes next.
+const DETAIL_LABELS = [
+  "Location",
+  "Scholarship Deadline",
+  "Deadline type",
+  "Degree levels",
+  "Duration of Award",
+  "Maximum amount of award",
+  "Restricted to these majors",
+  "Majors",
+];
+
+function extractField(text, label, allLabels) {
+  const idx = text.indexOf(label);
+  if (idx === -1) return null;
+  const after = text.slice(idx + label.length);
+  let end = after.length;
+  for (const other of allLabels) {
+    if (other === label) continue;
+    const otherIdx = after.indexOf(other);
+    if (otherIdx !== -1 && otherIdx < end) end = otherIdx;
+  }
+  return after.slice(0, Math.min(end, 300)).trim().replace(/^[:\s]+/, "");
+}
+
+function parseDetailPage(html, url, title) {
+  const text = htmlToText(html);
+
+  // Category: the site tags every entry as one of these two types on both
+  // the listing and detail page — this is what powers the University vs.
+  // External-organization filter.
+  const isHei = /HEI Financial Aid/i.test(text);
+  const isCountryBased = /Financial Aid \(Country Based\)/i.test(text);
+
+  const location = extractField(text, "Location", DETAIL_LABELS);
+  const deadline = extractField(text, "Scholarship Deadline", DETAIL_LABELS) || extractField(text, "Deadline type", DETAIL_LABELS);
+  const degreeLevels = extractField(text, "Degree levels", DETAIL_LABELS);
+  const duration = extractField(text, "Duration of Award", DETAIL_LABELS);
+  const maxAward = extractField(text, "Maximum amount of award", DETAIL_LABELS);
+  const majors = extractField(text, "Restricted to these majors", DETAIL_LABELS) || extractField(text, "Majors", DETAIL_LABELS);
+
+  // "Location" being blank, "All", or unset means open to any nationality;
+  // a specific country name means restricted to that nationality only.
+  const openToAllNationalities = !location || /^all$/i.test(location);
+
+  return {
+    title,
+    url,
+    type: isHei ? "university" : isCountryBased ? "external" : "unknown",
+    openToAllNationalities,
+    eligibleCountry: openToAllNationalities ? null : location,
+    deadline: deadline || null,
+    degreeLevels: degreeLevels || null,
+    duration: duration || null,
+    maxAward: maxAward || null,
+    majors: majors || null,
+  };
+}
+
+async function fetchListingPage(page) {
+  const url = `${LISTING_URL}?field_scholarship_degree_levels_tid=${BACHELORS_DEGREE_LEVEL_TID}&field_us_state_territory_tid=All&page=${page}`;
+  const res = await fetchWithTimeout(url).catch(() => null);
+  if (!res || !res.ok) return [];
+  const html = await res.text();
+  return parseListingPage(html);
+}
+
+async function fetchDetailPage(url, title) {
+  const res = await fetchWithTimeout(url).catch(() => null);
+  if (!res || !res.ok) return null;
+  const html = await res.text();
+  return parseDetailPage(html, url, title);
+}
+
+const CONCURRENCY = 5; // smaller than our other scripts — this is a small government site, be gentle
+
+async function main() {
+  console.log("Fetching Bachelor's-level scholarship listings from EducationUSA...");
+
+  // First, page through the listing to collect every scholarship's URL —
+  // we don't know the exact page count ahead of time with full confidence,
+  // so keep going until a page returns nothing new.
+  let allListings = [];
+  let page = 0;
+  let loggedListingSample = false;
+  while (true) {
+    const listings = await fetchListingPage(page);
+    if (!loggedListingSample) {
+      console.log(`\nSample parsed listing links from page 0 (for verifying parsing worked):\n`, JSON.stringify(listings.slice(0, 5), null, 2));
+      loggedListingSample = true;
+    }
+    if (listings.length === 0) break;
+    allListings = allListings.concat(listings);
+    console.log(`  page ${page}: ${listings.length} links found (${allListings.length} total so far)`);
+    page += 1;
+    if (page > 20) break; // safety cap — 133 results at 10/page should need ~14 pages
+    await new Promise((r) => setTimeout(r, 300));
+  }
+
+  // De-duplicate by URL — the same scholarship can appear on multiple
+  // listing pages if results shift between requests.
+  const uniqueListings = Array.from(new Map(allListings.map((l) => [l.url, l])).values());
+  console.log(`\nFound ${uniqueListings.length} unique scholarship links. Fetching full details for each...`);
+
+  const results = [];
+  let index = 0;
+  let completed = 0;
+  let loggedDetailSample = false;
+
+  async function worker() {
+    while (index < uniqueListings.length) {
+      const i = index++;
+      const { url, title } = uniqueListings[i];
+      try {
+        const detail = await fetchDetailPage(url, title);
+        if (detail) {
+          results.push(detail);
+          if (!loggedDetailSample) {
+            console.log("\nSample parsed detail page (for verifying field extraction worked):\n", JSON.stringify(detail, null, 2));
+            loggedDetailSample = true;
+          }
+        }
+      } catch (err) {
+        console.log(`  error on ${title}: ${err.message}`);
+      }
+      completed++;
+      if (completed % 20 === 0 || completed === uniqueListings.length) {
+        console.log(`  ${completed}/${uniqueListings.length} detail pages processed`);
+      }
+    }
+  }
+
+  await Promise.all(Array.from({ length: CONCURRENCY }, () => worker()));
+
+  const outPath = path.join(__dirname, "..", "data", "scholarships.json");
+  fs.writeFileSync(outPath, JSON.stringify(results, null, 2));
+  console.log(`\nSaved ${results.length} scholarships to ${outPath}`);
+
+  const universityCount = results.filter((r) => r.type === "university").length;
+  const externalCount = results.filter((r) => r.type === "external").length;
+  const unknownCount = results.filter((r) => r.type === "unknown").length;
+  console.log(`  University-specific: ${universityCount} | External organization: ${externalCount} | Unclassified: ${unknownCount}`);
+}
+
+main().catch((err) => {
+  console.error("Scholarships fetch failed:", err.message);
+  process.exit(1);
+});
