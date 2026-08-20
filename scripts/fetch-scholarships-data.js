@@ -151,10 +151,22 @@ async function fetchListingPage(page) {
   return parseListingPage(html);
 }
 
-async function fetchDetailPage(url, title) {
+async function fetchDetailPage(url, title, dumpRaw) {
   const res = await fetchWithTimeout(url).catch(() => null);
   if (!res || !res.ok) return null;
   const html = await res.text();
+
+  if (dumpRaw) {
+    // Full untruncated text dump of ONE real detail page — our label-
+    // guessing approach clearly missed the real structure last run (type
+    // detection failed completely, field boundaries leaked into footer
+    // content). Rather than guess a third time, see the real thing.
+    const fullText = htmlToText(html);
+    console.log(`\n=== FULL RAW TEXT DUMP: ${title} ===`);
+    console.log(fullText);
+    console.log(`=== END DUMP (${fullText.length} characters) ===\n`);
+  }
+
   return parseDetailPage(html, url, title);
 }
 
@@ -163,9 +175,12 @@ const CONCURRENCY = 5; // smaller than our other scripts — this is a small gov
 async function main() {
   console.log("Fetching Bachelor's-level scholarship listings from EducationUSA...");
 
-  // First, page through the listing to collect every scholarship's URL —
-  // we don't know the exact page count ahead of time with full confidence,
-  // so keep going until a page returns nothing new.
+  // First, page through the listing to collect every scholarship's URL.
+  // Real results come 11 per page (confirmed from a live run); a page
+  // returning fewer than that — but still more than 0 — is the last real
+  // page. A page returning exactly 0-1 links (a stray nav/footer link
+  // matching our URL pattern, not real results) means we've run past the
+  // end, so stop there rather than continuing to a safety cap.
   let allListings = [];
   let page = 0;
   let loggedListingSample = false;
@@ -175,11 +190,11 @@ async function main() {
       console.log(`\nSample parsed listing links from page 0 (for verifying parsing worked):\n`, JSON.stringify(listings.slice(0, 5), null, 2));
       loggedListingSample = true;
     }
-    if (listings.length === 0) break;
+    if (listings.length <= 1) break; // 0 or a single stray link = past real results
     allListings = allListings.concat(listings);
     console.log(`  page ${page}: ${listings.length} links found (${allListings.length} total so far)`);
     page += 1;
-    if (page > 20) break; // safety cap — 133 results at 10/page should need ~14 pages
+    if (page > 20) break; // hard safety cap regardless
     await new Promise((r) => setTimeout(r, 300));
   }
 
@@ -198,11 +213,11 @@ async function main() {
       const i = index++;
       const { url, title } = uniqueListings[i];
       try {
-        const detail = await fetchDetailPage(url, title);
+        const detail = await fetchDetailPage(url, title, !loggedDetailSample);
         if (detail) {
           results.push(detail);
           if (!loggedDetailSample) {
-            console.log("\nSample parsed detail page (for verifying field extraction worked):\n", JSON.stringify(detail, null, 2));
+            console.log("\nParsed result from that same page (using current best-guess extraction logic):\n", JSON.stringify(detail, null, 2));
             loggedDetailSample = true;
           }
         }
