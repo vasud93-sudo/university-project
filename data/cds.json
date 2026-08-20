@@ -7240,24 +7240,50 @@
   "144740": {
     "id": 144740,
     "name": "DePaul University",
-    "hasCdsData": false,
+    "hasCdsData": true,
+    "hasAnyData": true,
+    "satComposite50": 1200,
+    "satComposite25": 1140,
+    "satComposite75": 1330,
+    "actComposite25": 25,
+    "actComposite50": 28,
+    "actComposite75": 31,
+    "edOffered": false,
+    "eaOffered": null,
+    "waitlistOffered": 809,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": "https://www.collegedata.fyi/schools/depaul-university/2024-25",
+    "meritAid": null,
+    "internationalEnrollmentPct": null,
     "testOptional": {
       "status": "optional",
       "confidence": "confirmed",
       "source": "FairTest"
-    },
-    "hasAnyData": true
+    }
   },
   "144883": {
     "id": 144883,
     "name": "East-West University",
     "hasCdsData": false,
+    "hasAnyData": true,
+    "satComposite50": null,
+    "satComposite25": null,
+    "satComposite75": null,
+    "actComposite25": 15,
+    "actComposite50": null,
+    "actComposite75": 19,
+    "edOffered": null,
+    "eaOffered": null,
+    "waitlistOffered": null,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": null,
+    "meritAid": null,
+    "internationalEnrollmentPct": null,
     "testOptional": {
       "status": "optional",
       "confidence": "confirmed",
       "source": "FairTest"
-    },
-    "hasAnyData": true
+    }
   },
   "144892": {
     "id": 144892,
@@ -7287,12 +7313,25 @@
     "id": 144962,
     "name": "Elmhurst University",
     "hasCdsData": false,
+    "hasAnyData": true,
+    "satComposite50": null,
+    "satComposite25": 990,
+    "satComposite75": 1260,
+    "actComposite25": 23,
+    "actComposite50": 26,
+    "actComposite75": 30,
+    "edOffered": null,
+    "eaOffered": null,
+    "waitlistOffered": null,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": null,
+    "meritAid": null,
+    "internationalEnrollmentPct": null,
     "testOptional": {
       "status": "optional",
       "confidence": "confirmed",
       "source": "FairTest"
-    },
-    "hasAnyData": true
+    }
   },
   "144971": {
     "id": 144971,
@@ -7322,28 +7361,69 @@
     "id": 145336,
     "name": "Governors State University",
     "hasCdsData": false,
+    "hasAnyData": true,
+    "satComposite50": null,
+    "satComposite25": 830,
+    "satComposite75": 1060,
+    "actComposite25": 16,
+    "actComposite50": null,
+    "actComposite75": 22,
+    "edOffered": null,
+    "eaOffered": null,
+    "waitlistOffered": null,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": "https://www.collegedata.fyi/schools/governors-state-university/2023-24",
+    "meritAid": null,
+    "internationalEnrollmentPct": null,
     "testOptional": {
       "status": "optional",
       "confidence": "confirmed",
       "source": "FairTest"
-    },
-    "hasAnyData": true
+    }
   },
   "145372": {
     "id": 145372,
     "name": "Greenville University",
     "hasCdsData": false,
+    "hasAnyData": true,
+    "satComposite50": null,
+    "satComposite25": 771,
+    "satComposite75": 1230,
+    "actComposite25": 16,
+    "actComposite50": 22,
+    "actComposite75": 28,
+    "edOffered": null,
+    "eaOffered": null,
+    "waitlistOffered": null,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": null,
+    "meritAid": null,
+    "internationalEnrollmentPct": null,
     "testOptional": {
       "status": "optional",
       "confidence": "confirmed",
       "source": "FairTest"
-    },
-    "hasAnyData": true
+    }
   },
   "145497": {
     "id": 145497,
     "name": "Hebrew Theological College",
-    "hasCdsData": false
+    "hasCdsData": false,
+    "hasAnyData": true,
+    "satComposite50": null,
+    "satComposite25": 940,
+    "satComposite75": 1170,
+    "actComposite25": 20,
+    "actComposite50": null,
+    "actComposite75": 23,
+    "edOffered": null,
+    "eaOffered": null,
+    "waitlistOffered": null,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": null,
+    "meritAid": null,
+    "internationalEnrollmentPct": null,
+    "testOptional": null
   },
   "145600": {
     "id": 145600,
@@ -7374,24 +7454,53 @@
   "145619": {
     "id": 145619,
     "name": "Benedictine University",
-    "hasCdsData": false,
+    "hasCdsData": true,
+    "hasAnyData": true,
+    "satComposite50": 1065,
+    "satComposite25": 1050,
+    "satComposite75": 1280,
+    "actComposite25": 19,
+    "actComposite50": 26,
+    "actComposite75": 28,
+    "edOffered": false,
+    "eaOffered": null,
+    "waitlistOffered": null,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": "https://www.collegedata.fyi/schools/benedictine-university/2024-25",
+    "meritAid": null,
+    "internationalEnrollmentPct": null,
     "testOptional": {
       "status": "optional",
       "confidence": "confirmed",
       "source": "FairTest"
-    },
-    "hasAnyData": true
+    }
   },
   "145637": {
     "id": 145637,
     "name": "University of Illinois Urbana-Champaign",
-    "hasCdsData": false,
+    "hasCdsData": true,
+    "hasAnyData": true,
+    "satComposite50": 1470,
+    "satComposite25": 1310,
+    "satComposite75": 1520,
+    "actComposite25": 30,
+    "actComposite50": 32,
+    "actComposite75": 34,
+    "edOffered": false,
+    "eaOffered": null,
+    "waitlistOffered": 2794,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": "https://www.collegedata.fyi/schools/university-of-illinois-urbana-champaign/2024-25",
+    "meritAid": {
+      "recipientShare": 0.001970936047537801,
+      "avgAward": 3644
+    },
+    "internationalEnrollmentPct": null,
     "testOptional": {
       "status": "optional",
       "confidence": "confirmed",
       "source": "FairTest"
-    },
-    "hasAnyData": true
+    }
   },
   "145646": {
     "id": 145646,
@@ -10425,7 +10534,21 @@
     "id": 155900,
     "name": "Southwestern College",
     "hasCdsData": false,
-    "hasAnyData": false
+    "hasAnyData": true,
+    "satComposite50": null,
+    "satComposite25": 900,
+    "satComposite75": 1220,
+    "actComposite25": 17,
+    "actComposite50": 19,
+    "actComposite75": 22,
+    "edOffered": null,
+    "eaOffered": null,
+    "waitlistOffered": null,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": null,
+    "meritAid": null,
+    "internationalEnrollmentPct": null,
+    "testOptional": null
   },
   "155937": {
     "id": 155937,
@@ -20604,6 +20727,19 @@
     "name": "Davis College",
     "hasCdsData": false,
     "hasAnyData": true,
+    "satComposite50": null,
+    "satComposite25": 850,
+    "satComposite75": 1080,
+    "actComposite25": 15,
+    "actComposite50": null,
+    "actComposite75": 24,
+    "edOffered": null,
+    "eaOffered": null,
+    "waitlistOffered": null,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": null,
+    "meritAid": null,
+    "internationalEnrollmentPct": null,
     "testOptional": {
       "status": "optional",
       "confidence": "confirmed",
@@ -36251,7 +36387,8 @@
   "245883": {
     "id": 245883,
     "name": "Antioch University-Seattle",
-    "hasCdsData": false
+    "hasCdsData": false,
+    "hasAnyData": false
   },
   "245892": {
     "id": 245892,
@@ -36311,12 +36448,12 @@
     "id": 247649,
     "name": "Landmark College",
     "hasCdsData": false,
+    "hasAnyData": true,
     "testOptional": {
       "status": "optional",
       "confidence": "confirmed",
       "source": "FairTest"
-    },
-    "hasAnyData": true
+    }
   },
   "247773": {
     "id": 247773,
@@ -37599,6 +37736,19 @@
     "name": "Northcentral University",
     "hasCdsData": false,
     "hasAnyData": true,
+    "satComposite50": null,
+    "satComposite25": 950,
+    "satComposite75": 1148,
+    "actComposite25": 18,
+    "actComposite50": null,
+    "actComposite75": 24,
+    "edOffered": null,
+    "eaOffered": null,
+    "waitlistOffered": null,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": null,
+    "meritAid": null,
+    "internationalEnrollmentPct": null,
     "testOptional": {
       "status": "optional",
       "confidence": "confirmed",
