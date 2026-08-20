@@ -82,18 +82,22 @@ function parseListingPage(html) {
   return results;
 }
 
-// Known field labels this site uses on every scholarship's detail page,
-// directly observed rather than guessed. Extraction grabs the text after
-// a label up to whichever known label (or a length cap) comes next.
+// Known field labels, plus a universal terminator: "Search form" reliably
+// marks the exact boundary where every page's shared footer boilerplate
+// begins (confirmed identical across all 5 real pages checked). Without
+// this, extraction ran straight into "Our Goal... Privacy Notice... FAQs"
+// on any field with nothing else after it — the actual bug we hit.
 const DETAIL_LABELS = [
   "Location",
   "Scholarship Deadline",
-  "Deadline type",
+  "Scholarship deadline same as application deadline",
+  "Scholarship deadline different from application deadline",
   "Degree levels",
   "Duration of Award",
   "Maximum amount of award",
   "Restricted to these majors",
   "Majors",
+  "Search form", // universal terminator — always present, always after real content
 ];
 
 function extractField(text, label, allLabels) {
@@ -106,40 +110,72 @@ function extractField(text, label, allLabels) {
     const otherIdx = after.indexOf(other);
     if (otherIdx !== -1 && otherIdx < end) end = otherIdx;
   }
-  return after.slice(0, Math.min(end, 300)).trim().replace(/^[:\s]+/, "");
+  return after.slice(0, Math.min(end, 300)).trim().replace(/^[:\s]+/, "") || null;
 }
 
-function parseDetailPage(html, url, title) {
+// The sponsoring organization's name sits right after the title and right
+// before a logo image filename (e.g. "Trinity University" then
+// "TU logo.jpg") — a reliable structural marker confirmed across all 5
+// real pages checked. Cross-referencing this name against our own
+// verified university list (schoolNames) is a more reliable way to
+// classify "university vs. external" than any on-page label, since the
+// "HEI Financial Aid" / "Financial Aid (Country Based)" tags we originally
+// spotted turned out not to exist on these pages at all.
+function extractSponsoringOrg(text, title) {
+  const titleIdx = text.lastIndexOf(title);
+  if (titleIdx === -1) return null;
+  const after = text.slice(titleIdx + title.length, titleIdx + title.length + 400);
+  const imageMatch = after.match(/\.(jpg|jpeg|png|gif)\b/i);
+  if (!imageMatch) return null;
+  const beforeImage = after.slice(0, imageMatch.index);
+  // The org name is the FIRST non-empty line in this section — the logo
+  // filename itself (e.g. "UWS Logo") is a later line in the same
+  // section, so taking the whole block would wrongly append it.
+  const firstLine = beforeImage.split("\n").map((l) => l.trim()).find((l) => l.length > 0);
+  return firstLine || null;
+}
+
+function classifyType(orgName, schoolNames) {
+  if (!orgName) return "unknown";
+  const normalized = orgName.toLowerCase().trim();
+  const isKnownUniversity = schoolNames.some((name) => {
+    const n = name.toLowerCase();
+    return n === normalized || n.startsWith(normalized) || normalized.startsWith(n.replace(/-[^-]+$/, ""));
+  });
+  return isKnownUniversity ? "university" : "external";
+}
+
+function parseDetailPage(html, url, title, schoolNames) {
   const text = htmlToText(html);
 
-  // Category: the site tags every entry as one of these two types on both
-  // the listing and detail page — this is what powers the University vs.
-  // External-organization filter.
-  const isHei = /HEI Financial Aid/i.test(text);
-  const isCountryBased = /Financial Aid \(Country Based\)/i.test(text);
+  const orgName = extractSponsoringOrg(text, title);
+  const type = classifyType(orgName, schoolNames);
 
   const location = extractField(text, "Location", DETAIL_LABELS);
-  const deadline = extractField(text, "Scholarship Deadline", DETAIL_LABELS) || extractField(text, "Deadline type", DETAIL_LABELS);
+  const deadline = extractField(text, "Scholarship Deadline", DETAIL_LABELS);
   const degreeLevels = extractField(text, "Degree levels", DETAIL_LABELS);
   const duration = extractField(text, "Duration of Award", DETAIL_LABELS);
   const maxAward = extractField(text, "Maximum amount of award", DETAIL_LABELS);
   const majors = extractField(text, "Restricted to these majors", DETAIL_LABELS) || extractField(text, "Majors", DETAIL_LABELS);
 
-  // "Location" being blank, "All", or unset means open to any nationality;
-  // a specific country name means restricted to that nationality only.
+  // "Location" only appears at all on country-tied scholarships — absent
+  // entirely (as on every HEI example checked) correctly means open to
+  // all nationalities, since EducationUSA's whole audience is
+  // international students by default.
   const openToAllNationalities = !location || /^all$/i.test(location);
 
   return {
     title,
     url,
-    type: isHei ? "university" : isCountryBased ? "external" : "unknown",
+    sponsoringOrg: orgName,
+    type,
     openToAllNationalities,
     eligibleCountry: openToAllNationalities ? null : location,
-    deadline: deadline || null,
-    degreeLevels: degreeLevels || null,
-    duration: duration || null,
-    maxAward: maxAward || null,
-    majors: majors || null,
+    deadline,
+    degreeLevels,
+    duration,
+    maxAward,
+    majors,
   };
 }
 
@@ -151,7 +187,7 @@ async function fetchListingPage(page) {
   return parseListingPage(html);
 }
 
-async function fetchDetailPage(url, title, dumpRaw) {
+async function fetchDetailPage(url, title, dumpRaw, schoolNames) {
   const res = await fetchWithTimeout(url).catch(() => null);
   if (!res || !res.ok) return null;
   const html = await res.text();
@@ -167,13 +203,21 @@ async function fetchDetailPage(url, title, dumpRaw) {
     console.log(`=== END DUMP (${fullText.length} characters) ===\n`);
   }
 
-  return parseDetailPage(html, url, title);
+  return parseDetailPage(html, url, title, schoolNames);
 }
 
 const CONCURRENCY = 5; // smaller than our other scripts — this is a small government site, be gentle
 
 async function main() {
   console.log("Fetching Bachelor's-level scholarship listings from EducationUSA...");
+
+  // Load our own verified university names to cross-reference against —
+  // this is how we classify a scholarship as "university-specific" vs.
+  // "external organization," since the on-page category labels we
+  // originally spotted turned out not to exist on these pages at all.
+  const schoolsPath = path.join(__dirname, "..", "data", "schools.json");
+  const schoolNames = JSON.parse(fs.readFileSync(schoolsPath, "utf8")).map((s) => s.name);
+  console.log(`Loaded ${schoolNames.length} known university names for cross-referencing.`);
 
   // First, page through the listing to collect every scholarship's URL.
   // Real results come 11 per page (confirmed from a live run); a page
@@ -213,11 +257,11 @@ async function main() {
       const i = index++;
       const { url, title } = uniqueListings[i];
       try {
-        const detail = await fetchDetailPage(url, title, !loggedDetailSample);
+        const detail = await fetchDetailPage(url, title, false, schoolNames);
         if (detail) {
           results.push(detail);
           if (!loggedDetailSample) {
-            console.log("\nParsed result from that same page (using current best-guess extraction logic):\n", JSON.stringify(detail, null, 2));
+            console.log("\nSample parsed result (verifying the rebuilt extraction logic):\n", JSON.stringify(detail, null, 2));
             loggedDetailSample = true;
           }
         }
