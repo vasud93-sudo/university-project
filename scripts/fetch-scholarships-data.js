@@ -86,7 +86,12 @@ function htmlToText(html) {
 // this pattern is unlikely to change even if visual markup does.
 function parseListingPage(html) {
   const results = [];
-  const linkPattern = /<a[^>]+href="((?:https:\/\/educationusa\.state\.gov)?\/(?:scholarships\/[a-z0-9-]+|node\/\d+))"[^>]*>([^<]+)<\/a>/gi;
+  // Only match real /scholarships/slug URLs — the generic /node/123
+  // pattern was also matching non-scholarship utility pages (confirmed
+  // real: "Error/Bug Submission Form" got scraped as a fake "scholarship"
+  // on a live run). Every real scholarship we've seen consistently uses
+  // the /scholarships/ path, so dropping /node/ loses nothing real.
+  const linkPattern = /<a[^>]+href="((?:https:\/\/educationusa\.state\.gov)?\/scholarships\/[a-z0-9-]+)"[^>]*>([^<]+)<\/a>/gi;
   let match;
   const seen = new Set();
   while ((match = linkPattern.exec(html)) !== null) {
