@@ -58,18 +58,24 @@ async function fetchWithRetry(url, options = {}, timeoutMs = 20000) {
 // Converts raw HTML to plain text while preserving line breaks at block
 // element boundaries — critical so "Location" and "Albania" don't get
 // concatenated into "LocationAlbania" once tags are stripped.
-function htmlToText(html) {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/gi, "")
-    .replace(/<style[\s\S]*?<\/style>/gi, "")
-    .replace(/<(br|\/div|\/p|\/li|\/h[1-6]|\/tr)\s*\/?>/gi, "\n")
-    .replace(/<[^>]+>/g, " ")
+function decodeEntities(str) {
+  return str
     .replace(/&amp;/g, "&")
     .replace(/&#039;/g, "'")
     .replace(/&quot;/g, '"')
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
-    .replace(/&nbsp;/g, " ")
+    .replace(/&nbsp;/g, " ");
+}
+
+function htmlToText(html) {
+  return decodeEntities(
+    html
+      .replace(/<script[\s\S]*?<\/script>/gi, "")
+      .replace(/<style[\s\S]*?<\/style>/gi, "")
+      .replace(/<(br|\/div|\/p|\/li|\/h[1-6]|\/tr)\s*\/?>/gi, "\n")
+      .replace(/<[^>]+>/g, " ")
+  )
     .replace(/[ \t]+/g, " ")
     .replace(/\n[ \t]*\n+/g, "\n")
     .trim();
@@ -85,7 +91,13 @@ function parseListingPage(html) {
   const seen = new Set();
   while ((match = linkPattern.exec(html)) !== null) {
     const url = match[1].startsWith("http") ? match[1] : BASE_URL + match[1];
-    const title = match[2].trim();
+    // Decode entities here — the detail page's text also gets decoded
+    // (via htmlToText), so an undecoded title like "President&#039;s..."
+    // would never match its own decoded page text later. This was
+    // silently breaking sponsoringOrg extraction for every title with an
+    // apostrophe, ampersand, or similar character (confirmed: 100/134
+    // came back null on a real run, while simple titles worked fine).
+    const title = decodeEntities(match[2].trim());
     // Skip nav/footer links that happen to match the URL pattern but
     // aren't real scholarship titles (e.g. "Read more", empty text).
     if (!title || title.length < 4 || /^read more$/i.test(title)) continue;
