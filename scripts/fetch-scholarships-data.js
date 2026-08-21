@@ -203,11 +203,31 @@ function classifyType(orgName, schoolNames) {
   return isKnownUniversity ? "university" : "external";
 }
 
+// Fallback for pages with no logo image at all (confirmed real on a live
+// run — some scholarship pages skip straight from title into the
+// description with no separate org-name/logo block, breaking the
+// primary image-anchored extraction entirely). Many titles already name
+// their university directly (e.g. "Ohio Wesleyan's Bashford Award"), so
+// checking the title text itself recovers a real number of these.
+function classifyFromTitle(title, schoolNames) {
+  const normalizedTitle = normalizeForMatch(title);
+  const match = schoolNames.find((name) => {
+    const normalizedSchool = normalizeForMatch(name);
+    // Require a reasonably substantial school name match (avoid a short,
+    // generic normalized name like "state" matching almost anything).
+    return normalizedSchool.length > 5 && normalizedTitle.includes(normalizedSchool);
+  });
+  return match ? "university" : null;
+}
+
 function parseDetailPage(html, url, title, schoolNames, debug) {
   const text = htmlToText(html);
 
   const orgName = extractSponsoringOrg(text, title, debug);
-  const type = classifyType(orgName, schoolNames);
+  let type = classifyType(orgName, schoolNames);
+  if (type === "unknown") {
+    type = classifyFromTitle(title, schoolNames) || "unknown";
+  }
 
   const location = extractField(text, "Location", DETAIL_LABELS);
   const deadline = extractField(text, "Scholarship Deadline", DETAIL_LABELS);
