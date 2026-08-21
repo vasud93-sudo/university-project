@@ -135,12 +135,30 @@ function extractSponsoringOrg(text, title) {
   return firstLine || null;
 }
 
+// Strips common filler words/punctuation so naming differences between
+// EducationUSA's display name and College Scorecard's official name
+// (e.g. "Ohio Wesleyan" vs "Ohio Wesleyan University", or a trailing
+// "-Main Campus" style campus qualifier) don't cause a real match to be
+// missed. Both sides get the same normalization, so a genuine match still
+// compares cleanly even with words stripped from both.
+function normalizeForMatch(name) {
+  return name
+    .toLowerCase()
+    .replace(/-[^-]+$/, "") // trailing "-Main Campus" / "-Los Angeles" style campus suffix
+    .replace(/&/g, "and")
+    .replace(/[.,']/g, "")
+    .replace(/\b(university|college|institute|the|of|at|and)\b/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function classifyType(orgName, schoolNames) {
   if (!orgName) return "unknown";
-  const normalized = orgName.toLowerCase().trim();
+  const normalizedOrg = normalizeForMatch(orgName);
+  if (!normalizedOrg) return "unknown"; // name was ONLY filler words — too ambiguous to match
   const isKnownUniversity = schoolNames.some((name) => {
-    const n = name.toLowerCase();
-    return n === normalized || n.startsWith(normalized) || normalized.startsWith(n.replace(/-[^-]+$/, ""));
+    const normalizedSchool = normalizeForMatch(name);
+    return normalizedSchool === normalizedOrg || normalizedSchool.includes(normalizedOrg) || normalizedOrg.includes(normalizedSchool);
   });
   return isKnownUniversity ? "university" : "external";
 }
@@ -285,6 +303,15 @@ async function main() {
   const externalCount = results.filter((r) => r.type === "external").length;
   const unknownCount = results.filter((r) => r.type === "unknown").length;
   console.log(`  University-specific: ${universityCount} | External organization: ${externalCount} | Unclassified: ${unknownCount}`);
+
+  // Diagnostic: 100/130 "unclassified" on the first real run is very
+  // likely a matching-logic problem, not a true reflection of the data —
+  // every sample checked by hand so far was a genuine university. List
+  // the actual org names that failed to match, so the real cause (naming
+  // mismatch vs. genuinely-unmatched) is visible instead of guessed again.
+  const unclassifiedOrgs = results.filter((r) => r.type === "unknown").map((r) => r.sponsoringOrg);
+  console.log(`\nOrg names that failed to classify (${unclassifiedOrgs.length} total):`);
+  console.log(JSON.stringify(unclassifiedOrgs, null, 2));
 }
 
 main().catch((err) => {
