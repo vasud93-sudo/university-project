@@ -147,11 +147,25 @@ function extractField(text, label, allLabels) {
 // classify "university vs. external" than any on-page label, since the
 // "HEI Financial Aid" / "Financial Aid (Country Based)" tags we originally
 // spotted turned out not to exist on these pages at all.
-function extractSponsoringOrg(text, title) {
+function extractSponsoringOrg(text, title, debug) {
   const titleIdx = text.lastIndexOf(title);
+  if (debug) {
+    console.log(`  [debug] searching for title: "${title}"`);
+    console.log(`  [debug] lastIndexOf result: ${titleIdx}`);
+    if (titleIdx === -1) {
+      // Show what the text actually contains near where we'd expect the
+      // title, so a mismatch (extra whitespace, different casing, a
+      // truncated title, etc.) is visible instead of guessed at again.
+      console.log(`  [debug] title NOT found. Full page text length: ${text.length}`);
+      console.log(`  [debug] first 300 chars of page text:\n${text.slice(0, 300)}`);
+    }
+  }
   if (titleIdx === -1) return null;
   const after = text.slice(titleIdx + title.length, titleIdx + title.length + 400);
   const imageMatch = after.match(/\.(jpg|jpeg|png|gif)\b/i);
+  if (debug && !imageMatch) {
+    console.log(`  [debug] title WAS found, but no image extension in the 400 chars after it:\n${after}`);
+  }
   if (!imageMatch) return null;
   const beforeImage = after.slice(0, imageMatch.index);
   // The org name is the FIRST non-empty line in this section — the logo
@@ -189,10 +203,10 @@ function classifyType(orgName, schoolNames) {
   return isKnownUniversity ? "university" : "external";
 }
 
-function parseDetailPage(html, url, title, schoolNames) {
+function parseDetailPage(html, url, title, schoolNames, debug) {
   const text = htmlToText(html);
 
-  const orgName = extractSponsoringOrg(text, title);
+  const orgName = extractSponsoringOrg(text, title, debug);
   const type = classifyType(orgName, schoolNames);
 
   const location = extractField(text, "Location", DETAIL_LABELS);
@@ -252,7 +266,7 @@ async function fetchListingPage(page, logDiagnostic) {
   return parseListingPage(html);
 }
 
-async function fetchDetailPage(url, title, dumpRaw, schoolNames) {
+async function fetchDetailPage(url, title, dumpRaw, schoolNames, debugOrgExtraction) {
   const res = await fetchWithRetry(url).catch(() => null);
   if (!res || !res.ok) return null;
   const html = await res.text();
@@ -268,7 +282,7 @@ async function fetchDetailPage(url, title, dumpRaw, schoolNames) {
     console.log(`=== END DUMP (${fullText.length} characters) ===\n`);
   }
 
-  return parseDetailPage(html, url, title, schoolNames);
+  return parseDetailPage(html, url, title, schoolNames, debugOrgExtraction);
 }
 
 const CONCURRENCY = 5; // smaller than our other scripts — this is a small government site, be gentle
@@ -316,14 +330,26 @@ async function main() {
   let index = 0;
   let completed = 0;
   let loggedDetailSample = false;
+  let failureDebugCount = 0;
+  const MAX_FAILURE_DEBUGS = 3;
 
   async function worker() {
     while (index < uniqueListings.length) {
       const i = index++;
       const { url, title } = uniqueListings[i];
       try {
-        const detail = await fetchDetailPage(url, title, false, schoolNames);
+        const detail = await fetchDetailPage(url, title, false, schoolNames, false);
         if (detail) {
+          if (detail.sponsoringOrg === null && failureDebugCount < MAX_FAILURE_DEBUGS) {
+            // Re-fetch with debug logging on for real failing cases —
+            // shows exactly whether the title was found on the page at
+            // all, and if so, why the image-extension anchor after it
+            // didn't work. This is targeted at the actual problem instead
+            // of guessing again from a successful example.
+            failureDebugCount++;
+            console.log(`\n=== Debugging failure #${failureDebugCount}: "${title}" ===`);
+            await fetchDetailPage(url, title, false, schoolNames, true);
+          }
           results.push(detail);
           if (!loggedDetailSample) {
             console.log("\nSample parsed result (verifying the rebuilt extraction logic):\n", JSON.stringify(detail, null, 2));
