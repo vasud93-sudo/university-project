@@ -13569,25 +13569,12 @@
     "id": 166674,
     "name": "Massachusetts College of Art and Design",
     "hasCdsData": false,
-    "hasAnyData": true,
-    "satComposite50": null,
-    "satComposite25": 970,
-    "satComposite75": 1160,
-    "actComposite25": 21,
-    "actComposite50": null,
-    "actComposite75": 26,
-    "edOffered": null,
-    "eaOffered": null,
-    "waitlistOffered": null,
-    "sourceName": "school-published Common Data Set",
-    "cdsDocumentUrl": null,
-    "meritAid": null,
-    "internationalEnrollmentPct": null,
     "testOptional": {
       "status": "optional",
       "confidence": "confirmed",
       "source": "FairTest"
-    }
+    },
+    "hasAnyData": true
   },
   "166683": {
     "id": 166683,
