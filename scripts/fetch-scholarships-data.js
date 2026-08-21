@@ -31,13 +31,27 @@ const CLIENT_HEADERS = {
   "User-Agent": "us-university-catalog (student project; free scholarship listing for international students)",
 };
 
-async function fetchWithTimeout(url, options = {}, timeoutMs = 10000) {
+async function fetchWithTimeout(url, options = {}, timeoutMs = 20000) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
     return await fetch(url, { ...options, signal: controller.signal, headers: CLIENT_HEADERS });
   } finally {
     clearTimeout(timeout);
+  }
+}
+
+// This site occasionally responds slowly enough to trip even a generous
+// timeout (confirmed live: a real run hit "This operation was aborted" on
+// page 0 despite an earlier run succeeding fine) — a single retry after a
+// short pause is cheap insurance against one slow response killing the
+// whole run.
+async function fetchWithRetry(url, options = {}, timeoutMs = 20000) {
+  try {
+    return await fetchWithTimeout(url, options, timeoutMs);
+  } catch (err) {
+    await new Promise((r) => setTimeout(r, 2000));
+    return fetchWithTimeout(url, options, timeoutMs);
   }
 }
 
@@ -201,7 +215,7 @@ async function fetchListingPage(page, logDiagnostic) {
   const url = `${LISTING_URL}?field_scholarship_degree_levels_tid=${BACHELORS_DEGREE_LEVEL_TID}&field_us_state_territory_tid=All&page=${page}`;
   let res;
   try {
-    res = await fetchWithTimeout(url);
+    res = await fetchWithRetry(url);
   } catch (err) {
     if (logDiagnostic) console.log(`\nFetch to ${url} threw an error: ${err.message}`);
     return [];
@@ -227,7 +241,7 @@ async function fetchListingPage(page, logDiagnostic) {
 }
 
 async function fetchDetailPage(url, title, dumpRaw, schoolNames) {
-  const res = await fetchWithTimeout(url).catch(() => null);
+  const res = await fetchWithRetry(url).catch(() => null);
   if (!res || !res.ok) return null;
   const html = await res.text();
 
