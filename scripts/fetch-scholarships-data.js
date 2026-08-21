@@ -197,11 +197,32 @@ function parseDetailPage(html, url, title, schoolNames) {
   };
 }
 
-async function fetchListingPage(page) {
+async function fetchListingPage(page, logDiagnostic) {
   const url = `${LISTING_URL}?field_scholarship_degree_levels_tid=${BACHELORS_DEGREE_LEVEL_TID}&field_us_state_territory_tid=All&page=${page}`;
-  const res = await fetchWithTimeout(url).catch(() => null);
-  if (!res || !res.ok) return [];
+  let res;
+  try {
+    res = await fetchWithTimeout(url);
+  } catch (err) {
+    if (logDiagnostic) console.log(`\nFetch to ${url} threw an error: ${err.message}`);
+    return [];
+  }
+
+  if (logDiagnostic) {
+    console.log(`\nDiagnostic — request to ${url}`);
+    console.log(`  Status: ${res.status} ${res.statusText}`);
+    console.log(`  Headers: ${JSON.stringify(Object.fromEntries(res.headers.entries()))}`);
+  }
+
+  if (!res.ok) {
+    if (logDiagnostic) console.log(`  Response NOT ok — this is likely why 0 results came back.`);
+    return [];
+  }
+
   const html = await res.text();
+  if (logDiagnostic) {
+    console.log(`  Response body length: ${html.length} characters`);
+    console.log(`  First 500 characters of body:\n${html.slice(0, 500)}`);
+  }
   return parseListingPage(html);
 }
 
@@ -247,7 +268,7 @@ async function main() {
   let page = 0;
   let loggedListingSample = false;
   while (true) {
-    const listings = await fetchListingPage(page);
+    const listings = await fetchListingPage(page, page === 0);
     if (!loggedListingSample) {
       console.log(`\nSample parsed listing links from page 0 (for verifying parsing worked):\n`, JSON.stringify(listings.slice(0, 5), null, 2));
       loggedListingSample = true;
