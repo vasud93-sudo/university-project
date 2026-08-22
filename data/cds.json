@@ -13569,12 +13569,25 @@
     "id": 166674,
     "name": "Massachusetts College of Art and Design",
     "hasCdsData": false,
+    "hasAnyData": true,
+    "satComposite50": null,
+    "satComposite25": 970,
+    "satComposite75": 1160,
+    "actComposite25": 21,
+    "actComposite50": null,
+    "actComposite75": 26,
+    "edOffered": null,
+    "eaOffered": null,
+    "waitlistOffered": null,
+    "sourceName": "school-published Common Data Set",
+    "cdsDocumentUrl": null,
+    "meritAid": null,
+    "internationalEnrollmentPct": null,
     "testOptional": {
       "status": "optional",
       "confidence": "confirmed",
       "source": "FairTest"
-    },
-    "hasAnyData": true
+    }
   },
   "166683": {
     "id": 166683,
@@ -25767,20 +25780,23 @@
   "207500": {
     "id": 207500,
     "name": "University of Oklahoma-Norman Campus",
-    "hasCdsData": false,
+    "hasCdsData": true,
     "hasAnyData": true,
-    "satComposite50": null,
+    "satComposite50": 1232,
     "satComposite25": 1140,
     "satComposite75": 1330,
     "actComposite25": 23,
     "actComposite50": 26,
     "actComposite75": 29,
-    "edOffered": null,
-    "eaOffered": null,
-    "waitlistOffered": null,
+    "edOffered": false,
+    "eaOffered": true,
+    "waitlistOffered": 3117,
     "sourceName": "school-published Common Data Set",
-    "cdsDocumentUrl": "https://www.collegedata.fyi/schools/university-of-oklahoma-norman-campus/2023-24",
-    "meritAid": null,
+    "cdsDocumentUrl": "https://www.collegedata.fyi/schools/university-of-oklahoma-norman-campus/2025-26",
+    "meritAid": {
+      "recipientShare": 0.11564482029598308,
+      "avgAward": 3642
+    },
     "internationalEnrollmentPct": null,
     "testOptional": {
       "status": "optional",
