@@ -115,45 +115,50 @@ function parseListingRows(html) {
     console.log(`[diagnostic] Substring count itself is low — most results likely load via JavaScript AFTER initial page load, not present in this HTML at all. This would need a different fetch approach entirely (like the AJAX endpoint we found for FairTest), not a regex fix.`);
   }
 
-  // Each row typically has TWO links to the same scholarship — one
-  // wrapping the logo image (no text content), one wrapping the title
-  // (real text). Keep only the text-bearing one per unique PID.
+  // Deduplicate by PID — keep EVERY unique-PID link as a row marker,
+  // regardless of whether the link's own inner text is populated. Real
+  // data proved most rows only wrap the LOGO IMAGE in a link (empty
+  // inner text) with the title displayed as separate nearby text, not
+  // inside any matching anchor at all — filtering out empty-text links
+  // (the earlier approach) incorrectly discarded ~657 of 658 real rows.
   const seenPid = new Set();
-  const titleLinks = [];
+  const rowAnchors = [];
   for (const link of allLinks) {
     const pidMatch = link.url.match(/PID=(\{[^}]+\})/);
     const pid = pidMatch ? pidMatch[1] : link.url;
-    if (!link.text || link.text.length < 2) continue; // an image-wrapping link has no text
     if (seenPid.has(pid)) continue;
     seenPid.add(pid);
-    titleLinks.push({ ...link, pid });
+    rowAnchors.push({ ...link, pid });
   }
 
   const results = [];
-  for (let i = 0; i < titleLinks.length; i++) {
-    const windowStart = titleLinks[i].end;
-    const windowEnd = i + 1 < titleLinks.length ? titleLinks[i + 1].index : Math.min(html.length, windowStart + 2000);
+  for (let i = 0; i < rowAnchors.length; i++) {
+    const windowStart = rowAnchors[i].end;
+    const windowEnd = i + 1 < rowAnchors.length ? rowAnchors[i + 1].index : Math.min(html.length, windowStart + 2000);
     const windowText = htmlToText(html.slice(windowStart, windowEnd));
 
     const eligMatch = windowText.match(/open to students from ([^\n]+)/i);
     const eligibilityText = eligMatch ? `Open to students from ${eligMatch[1].trim()}` : "";
 
-    // Org name: the first substantial line of nearby text that isn't the
-    // eligibility line itself.
-    const orgLine = windowText
-      .split("\n")
-      .map((l) => l.trim())
-      .find((l) => l.length > 1 && !/^open to students from/i.test(l)) || "";
+    // Pull BOTH title and org from the window's text lines, not from the
+    // anchor's own inner content — the anchor's inner text was proven
+    // unreliable (often just an image, no text). The title is the first
+    // substantial line; the org is the next one after it.
+    const lines = windowText.split("\n").map((l) => l.trim()).filter((l) => l.length > 1 && !/^open to students from/i.test(l));
+    // If the anchor itself DID have real inner text (the featured-listing
+    // case confirmed real), prefer that as the title — it's the most
+    // direct signal when available.
+    const title = rowAnchors[i].text && rowAnchors[i].text.length > 1 ? rowAnchors[i].text : lines[0] || "";
+    const orgLine = rowAnchors[i].text && rowAnchors[i].text.length > 1 ? lines[0] || "" : lines[1] || "";
 
-    const title = titleLinks[i].text;
     results.push({
-      pid: titleLinks[i].pid,
+      pid: rowAnchors[i].pid,
       title: title || "##NO AWARD NAME##",
       isInactive: /^inactive$/i.test(title.trim()),
       hasNoName: /##NO AWARD NAME##/i.test(title),
       sponsoringOrg: orgLine,
       eligibilityText,
-      detailUrl: titleLinks[i].url.startsWith("http") ? titleLinks[i].url : `${BASE_URL}/${titleLinks[i].url.replace(/^\//, "")}`,
+      detailUrl: rowAnchors[i].url.startsWith("http") ? rowAnchors[i].url : `${BASE_URL}/${rowAnchors[i].url.replace(/^\//, "")}`,
     });
   }
 
