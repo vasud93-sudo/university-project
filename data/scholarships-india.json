@@ -1,13 +1,13 @@
 [
   {
-    "title": "Asian Development Bank-Japan Scholarship Program (ADB-JSP)",
+    "title": "East-West Center Graduate Degree Fellowship",
     "isInactive": false,
     "hasNoName": false,
     "sponsoringOrg": "East-West Center",
-    "type": "university",
+    "type": "external",
     "eligibilityScope": "india-specific",
-    "detailUrl": "https://fundingusstudy.org/Listing.asp?state=&awardtype=&aos=&com=&spon=&area=2&area2=7&area3=68&PID={C56428A5-78F8-4019-A5A5-D9435D91D45E}&PRC=658&page=1&PMDSID=IIF-484&AdListingID=2115867",
-    "likelyBachelorsRelevant": true,
-    "likelyGraduateOnly": false
+    "detailUrl": "https://fundingusstudy.org/Listing.asp?state=&awardtype=&aos=&com=&spon=&area=2&area2=7&area3=68&PID={FCBBB759-A6D2-4541-AC54-2CAAB12A6307}&PRC=658&page=1&PMDSID=IIF-104&AdListingID=2115866",
+    "likelyBachelorsRelevant": false,
+    "likelyGraduateOnly": true
   }
 ]
