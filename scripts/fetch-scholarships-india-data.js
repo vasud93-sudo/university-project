@@ -99,6 +99,22 @@ function parseListingRows(html) {
     allLinks.push({ index: m.index, end: m.index + m[0].length, url: m[1], text: cleanText });
   }
 
+  // Diagnostic: a simple, regex-independent substring count of how many
+  // times "PID={" actually appears in the raw HTML at all. If this is
+  // also low (nowhere near ~1316 for 658 rows x 2 links), the real
+  // problem isn't the regex — it means most results aren't in the
+  // initial HTML at all, and load separately via JavaScript after page
+  // load (the same situation we hit with FairTest, needing a different
+  // endpoint entirely, not a regex fix).
+  const rawPidOccurrences = (html.match(/PID=\{/g) || []).length;
+  console.log(`\n[diagnostic] Raw regex matches (allLinks): ${allLinks.length}`);
+  console.log(`[diagnostic] Raw substring count of "PID={" in full HTML: ${rawPidOccurrences}`);
+  if (rawPidOccurrences > allLinks.length * 2) {
+    console.log(`[diagnostic] Substring count is much higher than regex matches — this points to a REGEX bug, not missing data.`);
+  } else if (rawPidOccurrences < 20) {
+    console.log(`[diagnostic] Substring count itself is low — most results likely load via JavaScript AFTER initial page load, not present in this HTML at all. This would need a different fetch approach entirely (like the AJAX endpoint we found for FairTest), not a regex fix.`);
+  }
+
   // Each row typically has TWO links to the same scholarship — one
   // wrapping the logo image (no text content), one wrapping the title
   // (real text). Keep only the text-bearing one per unique PID.
