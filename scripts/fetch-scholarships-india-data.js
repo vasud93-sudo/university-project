@@ -193,6 +193,20 @@ function checkBachelorsRelevance(pageText) {
   };
 }
 
+// The detail page has a direct "Sponsor Type: X" field (confirmed real:
+// "Sponsor Type: Non-Profit Organization/Agency/Association") — a much
+// more reliable type signal than fuzzy name-matching, when it's present.
+// Falls back to null (letting the name-match classifier decide) if this
+// field isn't found or doesn't map to a known category.
+function checkSponsorType(pageText) {
+  const match = pageText.match(/Sponsor Type:\s*([^\n]+)/i);
+  if (!match) return null;
+  const value = match[1].trim();
+  if (/university|college|institute|school/i.test(value)) return "university";
+  if (/non-?profit|government|association|agency|foundation|corporation/i.test(value)) return "external";
+  return null; // an unrecognized category — don't guess, let the fallback decide
+}
+
 async function fetchDetailPageText(url, dumpRaw) {
   const res = await fetchWithRetry(url).catch(() => null);
   if (!res || !res.ok) return null;
@@ -229,6 +243,27 @@ async function main() {
   console.log(`\nParsed ${rows.length} listing rows from the page.`);
   console.log("Sample of first 5 parsed rows (for verifying parsing worked):\n", JSON.stringify(rows.slice(0, 5), null, 2));
 
+  // Diagnostic: the first entry parsed perfectly, but if far fewer rows
+  // came back than expected (~658), the regex likely isn't matching
+  // entries beyond the first — possibly because the first/featured
+  // listing uses different markup than the regular repeating rows below
+  // it. Search for a scholarship we know exists further down the real
+  // page ("East-West Center Graduate Degree Fellowship", the second real
+  // result) and dump the raw HTML around it, so we can see its actual
+  // structure directly instead of guessing again.
+  if (rows.length < 100) {
+    const knownSecondEntry = "East-West Center Graduate Degree Fellowship";
+    const idx = html.indexOf(knownSecondEntry);
+    console.log(`\n--- Diagnostic: only ${rows.length} row(s) parsed, expected ~658 ---`);
+    if (idx === -1) {
+      console.log(`Could not find "${knownSecondEntry}" anywhere in the raw HTML at all.`);
+    } else {
+      console.log(`Found "${knownSecondEntry}" at character ${idx}. Raw HTML from 400 characters before to 400 after:\n`);
+      console.log(html.slice(Math.max(0, idx - 400), idx + 400));
+    }
+    console.log("--- End diagnostic ---\n");
+  }
+
   if (rows.length === 0) {
     console.error("\nZero rows parsed — the listing page's real markup doesn't match the assumed pattern. Stopping here rather than guessing further blindly.");
     console.log("First 2000 characters of raw HTML, for diagnosing the real structure:\n", html.slice(0, 2000));
@@ -249,7 +284,11 @@ async function main() {
         loggedDetailDump = true;
 
         const { scope, region } = classifyEligibility(row.eligibilityText);
-        const type = classifyType(row.sponsoringOrg, schoolNames);
+        const nameBasedType = classifyType(row.sponsoringOrg, schoolNames);
+        const sponsorTypeFromPage = pageText ? checkSponsorType(pageText) : null;
+        // Prefer the site's own direct "Sponsor Type" field when present
+        // and recognized — only fall back to name-matching when it isn't.
+        const type = sponsorTypeFromPage || nameBasedType;
         const bachelors = pageText ? checkBachelorsRelevance(pageText) : { likelyBachelorsRelevant: null, likelyGraduateOnly: null };
 
         results.push({
