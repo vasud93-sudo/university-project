@@ -13,19 +13,6 @@
     "majors": "All"
   },
   {
-    "title": "Ohio Wesleyan's Bashford Award",
-    "url": "https://educationusa.state.gov/scholarships/ohio-wesleyans-bashford-award",
-    "sponsoringOrg": null,
-    "type": "university",
-    "openToAllNationalities": true,
-    "eligibleCountry": null,
-    "deadline": "March 1, 2026",
-    "degreeLevels": "Undergraduate - Bachelor's",
-    "duration": null,
-    "maxAward": null,
-    "majors": "Accounting, Business, Biology, Astrophysics, Biochemistry, Chemistry, Communication, Computer Sci., Data Analytics, Economics, Education, Fine Art, Genetics, International Studies, Math, Pre-Law, Public Heath, Physics, Psych, Zoology"
-  },
-  {
     "title": "Trinity University offers International Academic Scholarships and Financial Aid",
     "url": "https://educationusa.state.gov/scholarships/trinity-university-offers-international-academic-scholarships-and-financial-aid",
     "sponsoringOrg": "Trinity University",
@@ -33,6 +20,19 @@
     "openToAllNationalities": true,
     "eligibleCountry": null,
     "deadline": "February 1, 2026",
+    "degreeLevels": "Undergraduate - Bachelor's",
+    "duration": null,
+    "maxAward": null,
+    "majors": null
+  },
+  {
+    "title": "JWU Global Full Tuition Scholarship",
+    "url": "https://educationusa.state.gov/scholarships/jwu-global-full-tuition-scholarship",
+    "sponsoringOrg": "Johnson & Wales University",
+    "type": "university",
+    "openToAllNationalities": true,
+    "eligibleCountry": null,
+    "deadline": "January 4, 2026",
     "degreeLevels": "Undergraduate - Bachelor's",
     "duration": null,
     "maxAward": null,
@@ -52,17 +52,30 @@
     "majors": null
   },
   {
-    "title": "Luther College Academic Scholarships",
-    "url": "https://educationusa.state.gov/scholarships/luther-college-academic-scholarships",
-    "sponsoringOrg": "Luther College",
+    "title": "President's Award for International Student Excellence",
+    "url": "https://educationusa.state.gov/scholarships/presidents-award-international-student-excellence",
+    "sponsoringOrg": "Iowa State University",
     "type": "university",
     "openToAllNationalities": true,
     "eligibleCountry": null,
-    "deadline": "January 1, 2026 for early action; March 1, 2026 for regular decision",
+    "deadline": "May 1",
     "degreeLevels": "Undergraduate - Bachelor's",
     "duration": null,
     "maxAward": null,
-    "majors": null
+    "majors": "All undergraduate majors"
+  },
+  {
+    "title": "Ohio Wesleyan's Bashford Award",
+    "url": "https://educationusa.state.gov/scholarships/ohio-wesleyans-bashford-award",
+    "sponsoringOrg": null,
+    "type": "university",
+    "openToAllNationalities": true,
+    "eligibleCountry": null,
+    "deadline": "March 1, 2026",
+    "degreeLevels": "Undergraduate - Bachelor's",
+    "duration": null,
+    "maxAward": null,
+    "majors": "Accounting, Business, Biology, Astrophysics, Biochemistry, Chemistry, Communication, Computer Sci., Data Analytics, Economics, Education, Fine Art, Genetics, International Studies, Math, Pre-Law, Public Heath, Physics, Psych, Zoology"
   },
   {
     "title": "University of Nebraska-Lincoln Global Arts Academy Scholarship",
@@ -91,17 +104,17 @@
     "majors": null
   },
   {
-    "title": "International Student Academic Scholarship",
-    "url": "https://educationusa.state.gov/scholarships/international-student-academic-scholarship",
-    "sponsoringOrg": "Caldwell University",
+    "title": "Luther College Academic Scholarships",
+    "url": "https://educationusa.state.gov/scholarships/luther-college-academic-scholarships",
+    "sponsoringOrg": "Luther College",
     "type": "university",
     "openToAllNationalities": true,
     "eligibleCountry": null,
-    "deadline": "June 1st (Fall semester) and December 1st (Spring semester)",
+    "deadline": "January 1, 2026 for early action; March 1, 2026 for regular decision",
     "degreeLevels": "Undergraduate - Bachelor's",
     "duration": null,
     "maxAward": null,
-    "majors": "All majors"
+    "majors": null
   },
   {
     "title": "The International Distinction in Education (IDEA) Award",
@@ -117,6 +130,19 @@
     "majors": "All undergraduate majors"
   },
   {
+    "title": "International Student Academic Scholarship",
+    "url": "https://educationusa.state.gov/scholarships/international-student-academic-scholarship",
+    "sponsoringOrg": "Caldwell University",
+    "type": "university",
+    "openToAllNationalities": true,
+    "eligibleCountry": null,
+    "deadline": "June 1st (Fall semester) and December 1st (Spring semester)",
+    "degreeLevels": "Undergraduate - Bachelor's",
+    "duration": null,
+    "maxAward": null,
+    "majors": "All majors"
+  },
+  {
     "title": "Sunflower Road Award",
     "url": "https://educationusa.state.gov/scholarships/sunflower-road-award",
     "sponsoringOrg": null,
@@ -128,19 +154,6 @@
     "duration": null,
     "maxAward": null,
     "majors": null
-  },
-  {
-    "title": "Trailblazer Opportunity Scholarship",
-    "url": "https://educationusa.state.gov/scholarships/trailblazer-opportunity-scholarship",
-    "sponsoringOrg": null,
-    "type": "unknown",
-    "openToAllNationalities": false,
-    "eligibleCountry": "Netherlands",
-    "deadline": "May, annually",
-    "degreeLevels": "Undergraduate - Bachelor's",
-    "duration": "One year",
-    "maxAward": "Full scholarship",
-    "majors": "All"
   },
   {
     "title": "Bashford International Scholarship",
@@ -156,30 +169,17 @@
     "majors": "Accounting, Business, Biology, Astrophysics, Biochemistry, Chemistry, Communication, Computer Sci., Data Analytics, Economics, Education, Fine Art, Genetics, International Studies, Math, Pre-Law, Pre-Med/Dentistry/Vet, Public Heath, Psy zoology, Physics,"
   },
   {
-    "title": "JWU Global Full Tuition Scholarship",
-    "url": "https://educationusa.state.gov/scholarships/jwu-global-full-tuition-scholarship",
-    "sponsoringOrg": "Johnson & Wales University",
-    "type": "university",
-    "openToAllNationalities": true,
-    "eligibleCountry": null,
-    "deadline": "January 4, 2026",
+    "title": "Trailblazer Opportunity Scholarship",
+    "url": "https://educationusa.state.gov/scholarships/trailblazer-opportunity-scholarship",
+    "sponsoringOrg": null,
+    "type": "unknown",
+    "openToAllNationalities": false,
+    "eligibleCountry": "Netherlands",
+    "deadline": "May, annually",
     "degreeLevels": "Undergraduate - Bachelor's",
-    "duration": null,
-    "maxAward": null,
-    "majors": null
-  },
-  {
-    "title": "President's Award for International Student Excellence",
-    "url": "https://educationusa.state.gov/scholarships/presidents-award-international-student-excellence",
-    "sponsoringOrg": "Iowa State University",
-    "type": "university",
-    "openToAllNationalities": true,
-    "eligibleCountry": null,
-    "deadline": "May 1",
-    "degreeLevels": "Undergraduate - Bachelor's",
-    "duration": null,
-    "maxAward": null,
-    "majors": "All undergraduate majors"
+    "duration": "One year",
+    "maxAward": "Full scholarship",
+    "majors": "All"
   },
   {
     "title": "Global Ambassadors Scholarship",
@@ -192,19 +192,6 @@
     "degreeLevels": "Undergraduate - Bachelor's",
     "duration": "Four years",
     "maxAward": "$ 20,000 \n \n \n Contact for more information\n \n \n Contact by e-mail",
-    "majors": null
-  },
-  {
-    "title": "Global Maverick Access Scholarship",
-    "url": "https://educationusa.state.gov/scholarships/global-maverick-access-scholarship",
-    "sponsoringOrg": "Minnesota State University, Mankato",
-    "type": "university",
-    "openToAllNationalities": false,
-    "eligibleCountry": "Angola \n \n Antigua and Barbuda \n \n Argentina \n \n Armenia \n \n Aruba \n \n Azerbaijan \n \n Barbados \n \n Bolivia \n \n Botswana \n \n Brazil \n \n Brunei \n \n Bulgaria \n \n Burma \n \n Burundi \n \n Cabo Verde \n \n Cambodia \n \n Chile \n \n Colombia \n \n Comoros \n \n Congo, Democratic Republic of the \n \n Costa Rica",
-    "deadline": "May 1 \n \n \n \n \n Recurs Annually",
-    "degreeLevels": "Undergraduate - Associate's \n \n Undergraduate - Bachelor's",
-    "duration": "Four years",
-    "maxAward": "$4,000 plus on-campus employment \n \n \n Contact for more information\n \n \n Contact by e-mail",
     "majors": null
   },
   {
@@ -247,30 +234,17 @@
     "majors": null
   },
   {
-    "title": "International Student Scholarship",
-    "url": "https://educationusa.state.gov/scholarships/international-student-scholarship-sonoma-state",
-    "sponsoringOrg": "Sonoma State University",
+    "title": "Global Maverick Access Scholarship",
+    "url": "https://educationusa.state.gov/scholarships/global-maverick-access-scholarship",
+    "sponsoringOrg": "Minnesota State University, Mankato",
     "type": "university",
-    "openToAllNationalities": true,
-    "eligibleCountry": null,
-    "deadline": "April 15, 2024",
-    "degreeLevels": "Undergraduate - Bachelor's \n \n Graduate - Master's",
-    "duration": null,
-    "maxAward": null,
-    "majors": "All"
-  },
-  {
-    "title": "International Merit Award",
-    "url": "https://educationusa.state.gov/scholarships/international-merit-award-0",
-    "sponsoringOrg": null,
-    "type": "university",
-    "openToAllNationalities": true,
-    "eligibleCountry": null,
-    "deadline": null,
+    "openToAllNationalities": false,
+    "eligibleCountry": "Angola \n \n Antigua and Barbuda \n \n Argentina \n \n Armenia \n \n Aruba \n \n Azerbaijan \n \n Barbados \n \n Bolivia \n \n Botswana \n \n Brazil \n \n Brunei \n \n Bulgaria \n \n Burma \n \n Burundi \n \n Cabo Verde \n \n Cambodia \n \n Chile \n \n Colombia \n \n Comoros \n \n Congo, Democratic Republic of the \n \n Costa Rica",
+    "deadline": "May 1 \n \n \n \n \n Recurs Annually",
     "degreeLevels": "Undergraduate - Associate's \n \n Undergraduate - Bachelor's",
-    "duration": null,
-    "maxAward": null,
-    "majors": "Culinary Arts, Baking and Pastry Arts, Food Business Management, Applied Food Studies, Culinary Science, Hospitality Management"
+    "duration": "Four years",
+    "maxAward": "$4,000 plus on-campus employment \n \n \n Contact for more information\n \n \n Contact by e-mail",
+    "majors": null
   },
   {
     "title": "Overseas Exchange Scholarship Program of Mirae Asset Park Hyeon Joo Foundation (미래에셋박현주재단 해외교환 장학생)",
@@ -286,17 +260,17 @@
     "majors": "All"
   },
   {
-    "title": "Korean American Scholarship Foundation (한미장학재단 한미장학금)",
-    "url": "https://educationusa.state.gov/scholarships/korean-american-scholarship-foundation-hanmijanghagjaedan-hanmijanghaggeum-0",
+    "title": "International Merit Award",
+    "url": "https://educationusa.state.gov/scholarships/international-merit-award-0",
     "sponsoringOrg": null,
     "type": "university",
-    "openToAllNationalities": false,
-    "eligibleCountry": "South Korea",
-    "deadline": "April-June \n \n \n \n \n Recurs Annually",
-    "degreeLevels": "Undergraduate - Associate's \n \n Undergraduate - Bachelor's \n \n Graduate - Master's \n \n Graduate - Doctorate",
-    "duration": "One year",
-    "maxAward": "$500~$5,000",
-    "majors": "All"
+    "openToAllNationalities": true,
+    "eligibleCountry": null,
+    "deadline": null,
+    "degreeLevels": "Undergraduate - Associate's \n \n Undergraduate - Bachelor's",
+    "duration": null,
+    "maxAward": null,
+    "majors": "Culinary Arts, Baking and Pastry Arts, Food Business Management, Applied Food Studies, Culinary Science, Hospitality Management"
   },
   {
     "title": "OAS Scholarship",
@@ -325,17 +299,30 @@
     "majors": "All majors"
   },
   {
-    "title": "International Distinction in Education (IDEA) Award",
-    "url": "https://educationusa.state.gov/scholarships/international-distinction-education-idea-award",
-    "sponsoringOrg": null,
+    "title": "International Student Scholarship",
+    "url": "https://educationusa.state.gov/scholarships/international-student-scholarship-sonoma-state",
+    "sponsoringOrg": "Sonoma State University",
     "type": "university",
     "openToAllNationalities": true,
     "eligibleCountry": null,
-    "deadline": null,
-    "degreeLevels": "Undergraduate - Bachelor's",
+    "deadline": "April 15, 2024",
+    "degreeLevels": "Undergraduate - Bachelor's \n \n Graduate - Master's",
     "duration": null,
     "maxAward": null,
-    "majors": "200 areas of study"
+    "majors": "All"
+  },
+  {
+    "title": "Korean American Scholarship Foundation (한미장학재단 한미장학금)",
+    "url": "https://educationusa.state.gov/scholarships/korean-american-scholarship-foundation-hanmijanghagjaedan-hanmijanghaggeum-0",
+    "sponsoringOrg": null,
+    "type": "university",
+    "openToAllNationalities": false,
+    "eligibleCountry": "South Korea",
+    "deadline": "April-June \n \n \n \n \n Recurs Annually",
+    "degreeLevels": "Undergraduate - Associate's \n \n Undergraduate - Bachelor's \n \n Graduate - Master's \n \n Graduate - Doctorate",
+    "duration": "One year",
+    "maxAward": "$500~$5,000",
+    "majors": "All"
   },
   {
     "title": "Hagop Bogigian Scholarship",
@@ -377,16 +364,29 @@
     "majors": "All majors are eligible to apply"
   },
   {
-    "title": "Olomouc Region Study Scholarship",
-    "url": "https://educationusa.state.gov/scholarships/olomouc-region-study-scholarship",
+    "title": "International Distinction in Education (IDEA) Award",
+    "url": "https://educationusa.state.gov/scholarships/international-distinction-education-idea-award",
+    "sponsoringOrg": null,
+    "type": "university",
+    "openToAllNationalities": true,
+    "eligibleCountry": null,
+    "deadline": null,
+    "degreeLevels": "Undergraduate - Bachelor's",
+    "duration": null,
+    "maxAward": null,
+    "majors": "200 areas of study"
+  },
+  {
+    "title": "Stipendium Peregrinum",
+    "url": "https://educationusa.state.gov/scholarships/stipendium-peregrinum",
     "sponsoringOrg": null,
     "type": "unknown",
     "openToAllNationalities": false,
-    "eligibleCountry": "Czechia",
-    "deadline": "January, June",
-    "degreeLevels": "Undergraduate - Associate's \n \n Undergraduate - Bachelor's \n \n Graduate - Master's \n \n Graduate - Doctorate \n \n Graduate - Post Doctorate",
-    "duration": "One Semester",
-    "maxAward": "30,000 CZK \n \n \n Contact for more information\n \n \n Contact by e-mail",
+    "eligibleCountry": "Hungary",
+    "deadline": "early winter for Component A and early summer for Component B \n \n \n \n \n Recurs Annually",
+    "degreeLevels": "Undergraduate - Bachelor's \n \n Graduate - Master's",
+    "duration": "One year",
+    "maxAward": null,
     "majors": null
   },
   {
@@ -403,16 +403,29 @@
     "majors": null
   },
   {
-    "title": "Stipendium Peregrinum",
-    "url": "https://educationusa.state.gov/scholarships/stipendium-peregrinum",
+    "title": "Fulbright Foreign Language Teaching Assistant Program",
+    "url": "https://educationusa.state.gov/scholarships/fulbright-foreign-language-teaching-assistant-program-0",
+    "sponsoringOrg": null,
+    "type": "unknown",
+    "openToAllNationalities": true,
+    "eligibleCountry": null,
+    "deadline": "Every fall \n \n \n \n \n Recurs Annually",
+    "degreeLevels": "Undergraduate - Bachelor's \n \n Graduate - Master's",
+    "duration": "One year",
+    "maxAward": "Full tuition + stipend + travel grant + health insurance",
+    "majors": null
+  },
+  {
+    "title": "Olomouc Region Study Scholarship",
+    "url": "https://educationusa.state.gov/scholarships/olomouc-region-study-scholarship",
     "sponsoringOrg": null,
     "type": "unknown",
     "openToAllNationalities": false,
-    "eligibleCountry": "Hungary",
-    "deadline": "early winter for Component A and early summer for Component B \n \n \n \n \n Recurs Annually",
-    "degreeLevels": "Undergraduate - Bachelor's \n \n Graduate - Master's",
-    "duration": "One year",
-    "maxAward": null,
+    "eligibleCountry": "Czechia",
+    "deadline": "January, June",
+    "degreeLevels": "Undergraduate - Associate's \n \n Undergraduate - Bachelor's \n \n Graduate - Master's \n \n Graduate - Doctorate \n \n Graduate - Post Doctorate",
+    "duration": "One Semester",
+    "maxAward": "30,000 CZK \n \n \n Contact for more information\n \n \n Contact by e-mail",
     "majors": null
   },
   {
@@ -429,19 +442,6 @@
     "majors": "All"
   },
   {
-    "title": "Fulbright Foreign Language Teaching Assistant Program",
-    "url": "https://educationusa.state.gov/scholarships/fulbright-foreign-language-teaching-assistant-program-0",
-    "sponsoringOrg": null,
-    "type": "unknown",
-    "openToAllNationalities": true,
-    "eligibleCountry": null,
-    "deadline": "Every fall \n \n \n \n \n Recurs Annually",
-    "degreeLevels": "Undergraduate - Bachelor's \n \n Graduate - Master's",
-    "duration": "One year",
-    "maxAward": "Full tuition + stipend + travel grant + health insurance",
-    "majors": null
-  },
-  {
     "title": "International Student Scholarships",
     "url": "https://educationusa.state.gov/scholarships/international-student-scholarships-11",
     "sponsoringOrg": "University of Mary Washington",
@@ -453,19 +453,6 @@
     "duration": null,
     "maxAward": null,
     "majors": "All majors on campus"
-  },
-  {
-    "title": "Study Abroad Scholarship of Mogam Science Scholarship Foundation (목암과학장학재단 해외장학생)",
-    "url": "https://educationusa.state.gov/scholarships/study-abroad-scholarship-mogam-science-scholarship-foundation",
-    "sponsoringOrg": null,
-    "type": "unknown",
-    "openToAllNationalities": false,
-    "eligibleCountry": "South Korea",
-    "deadline": "Mid-September \n \n \n \n \n Recurs Annually",
-    "degreeLevels": "Undergraduate - Bachelor's \n \n Graduate - Master's \n \n Graduate - Doctorate \n \n Graduate - Post Doctorate",
-    "duration": "One year",
-    "maxAward": "$10,000",
-    "majors": "Science and Engineering (Preferred Major: Life Science, Medical Science, Pharmacy) \n \n \n Contact for more information\n \n \n Contact by e-mail"
   },
   {
     "title": "Sejong Scholarship Foundation of America (미주세종장학재단)",
@@ -494,6 +481,19 @@
     "majors": "The fields of art and humanities, engineering and technology, life science and medicine, natural sciences and social sciences and management."
   },
   {
+    "title": "Study Abroad Scholarship of Mogam Science Scholarship Foundation (목암과학장학재단 해외장학생)",
+    "url": "https://educationusa.state.gov/scholarships/study-abroad-scholarship-mogam-science-scholarship-foundation",
+    "sponsoringOrg": null,
+    "type": "unknown",
+    "openToAllNationalities": false,
+    "eligibleCountry": "South Korea",
+    "deadline": "Mid-September \n \n \n \n \n Recurs Annually",
+    "degreeLevels": "Undergraduate - Bachelor's \n \n Graduate - Master's \n \n Graduate - Doctorate \n \n Graduate - Post Doctorate",
+    "duration": "One year",
+    "maxAward": "$10,000",
+    "majors": "Science and Engineering (Preferred Major: Life Science, Medical Science, Pharmacy) \n \n \n Contact for more information\n \n \n Contact by e-mail"
+  },
+  {
     "title": "Walsh University offers $16,000 to $22,000 International Scholarship Packages!",
     "url": "https://educationusa.state.gov/scholarships/walsh-university-offers-16000-22000-international-scholarship-packages-0",
     "sponsoringOrg": "Walsh University",
@@ -520,12 +520,38 @@
     "majors": null
   },
   {
+    "title": "Belizean Student Scholarship",
+    "url": "https://educationusa.state.gov/scholarships/belizean-student-scholarship",
+    "sponsoringOrg": "Murray State University",
+    "type": "university",
+    "openToAllNationalities": false,
+    "eligibleCountry": "Belize \n \n United States",
+    "deadline": "No Deadline \n \n \n \n \n Recurs Annually",
+    "degreeLevels": "Undergraduate - Associate's \n \n Undergraduate - Bachelor's \n \n Graduate - Master's \n \n Graduate - Doctorate",
+    "duration": "Two years",
+    "maxAward": "Approximately $3,000 Annually",
+    "majors": null
+  },
+  {
     "title": "Walsh University Offers $20,000 to Full Tuition Four-Year Scholarships!",
     "url": "https://educationusa.state.gov/scholarships/walsh-university-offers-20000-full-tuition-four-year-scholarships-0",
     "sponsoringOrg": "Walsh University",
     "type": "university",
     "openToAllNationalities": false,
     "eligibleCountry": "Nigeria",
+    "deadline": "May 2021 \n \n \n \n \n Recurs Annually",
+    "degreeLevels": "Undergraduate - Bachelor's",
+    "duration": "Four years",
+    "maxAward": "Full Tuition \n \n \n Contact for more information\n \n \n Contact by e-mail",
+    "majors": null
+  },
+  {
+    "title": "Walsh University Offers $20,000 to Full Tuition Four-Year Scholarships!",
+    "url": "https://educationusa.state.gov/scholarships/walsh-university-offers-20000-full-tuition-four-year-scholarships",
+    "sponsoringOrg": "Walsh University",
+    "type": "university",
+    "openToAllNationalities": false,
+    "eligibleCountry": "Ghana",
     "deadline": "May 2021 \n \n \n \n \n Recurs Annually",
     "degreeLevels": "Undergraduate - Bachelor's",
     "duration": "Four years",
@@ -546,32 +572,6 @@
     "majors": null
   },
   {
-    "title": "Walsh University Offers $20,000 to Full Tuition Four-Year Scholarships!",
-    "url": "https://educationusa.state.gov/scholarships/walsh-university-offers-20000-full-tuition-four-year-scholarships",
-    "sponsoringOrg": "Walsh University",
-    "type": "university",
-    "openToAllNationalities": false,
-    "eligibleCountry": "Ghana",
-    "deadline": "May 2021 \n \n \n \n \n Recurs Annually",
-    "degreeLevels": "Undergraduate - Bachelor's",
-    "duration": "Four years",
-    "maxAward": "Full Tuition \n \n \n Contact for more information\n \n \n Contact by e-mail",
-    "majors": null
-  },
-  {
-    "title": "Belizean Student Scholarship",
-    "url": "https://educationusa.state.gov/scholarships/belizean-student-scholarship",
-    "sponsoringOrg": "Murray State University",
-    "type": "university",
-    "openToAllNationalities": false,
-    "eligibleCountry": "Belize \n \n United States",
-    "deadline": "No Deadline \n \n \n \n \n Recurs Annually",
-    "degreeLevels": "Undergraduate - Associate's \n \n Undergraduate - Bachelor's \n \n Graduate - Master's \n \n Graduate - Doctorate",
-    "duration": "Two years",
-    "maxAward": "Approximately $3,000 Annually",
-    "majors": null
-  },
-  {
     "title": "Robitschek Scholarship, University of Nebraska-Lincoln",
     "url": "https://educationusa.state.gov/scholarships/robitschek-scholarship-university-nebraska-lincoln",
     "sponsoringOrg": null,
@@ -585,19 +585,6 @@
     "majors": null
   },
   {
-    "title": "New American University Scholarship",
-    "url": "https://educationusa.state.gov/scholarships/new-american-university-scholarship",
-    "sponsoringOrg": null,
-    "type": "university",
-    "openToAllNationalities": true,
-    "eligibleCountry": null,
-    "deadline": "Spring and Fall every year",
-    "degreeLevels": "Undergraduate - Bachelor's",
-    "duration": null,
-    "maxAward": null,
-    "majors": null
-  },
-  {
     "title": "Global Scholarship",
     "url": "https://educationusa.state.gov/scholarships/global-scholarship-0",
     "sponsoringOrg": null,
@@ -605,6 +592,19 @@
     "openToAllNationalities": true,
     "eligibleCountry": null,
     "deadline": null,
+    "degreeLevels": "Undergraduate - Bachelor's",
+    "duration": null,
+    "maxAward": null,
+    "majors": null
+  },
+  {
+    "title": "New American University Scholarship",
+    "url": "https://educationusa.state.gov/scholarships/new-american-university-scholarship",
+    "sponsoringOrg": null,
+    "type": "university",
+    "openToAllNationalities": true,
+    "eligibleCountry": null,
+    "deadline": "Spring and Fall every year",
     "degreeLevels": "Undergraduate - Bachelor's",
     "duration": null,
     "maxAward": null,
@@ -637,19 +637,6 @@
     "majors": null
   },
   {
-    "title": "Campus Scholarship Program",
-    "url": "https://educationusa.state.gov/scholarships/campus-scholarship-program",
-    "sponsoringOrg": null,
-    "type": "unknown",
-    "openToAllNationalities": false,
-    "eligibleCountry": "Netherlands",
-    "deadline": "September, November, January \n \n \n \n \n Recurs Annually",
-    "degreeLevels": "Undergraduate - Bachelor's",
-    "duration": "One year",
-    "maxAward": "differs",
-    "majors": "liberal arts \n \n \n Contact for more information\n \n \n Contact by e-mail"
-  },
-  {
     "title": "Opportunity Funds Program - Belarus",
     "url": "https://educationusa.state.gov/scholarships/opportunity-funds-program-belarus",
     "sponsoringOrg": null,
@@ -661,6 +648,19 @@
     "duration": "One Semester",
     "maxAward": "Application expenses including standardized tests, U.S. air travel, setting in stipend (optional)",
     "majors": "All \n \n \n Contact for more information\n \n \n Contact by e-mail"
+  },
+  {
+    "title": "Campus Scholarship Program",
+    "url": "https://educationusa.state.gov/scholarships/campus-scholarship-program",
+    "sponsoringOrg": null,
+    "type": "unknown",
+    "openToAllNationalities": false,
+    "eligibleCountry": "Netherlands",
+    "deadline": "September, November, January \n \n \n \n \n Recurs Annually",
+    "degreeLevels": "Undergraduate - Bachelor's",
+    "duration": "One year",
+    "maxAward": "differs",
+    "majors": "liberal arts \n \n \n Contact for more information\n \n \n Contact by e-mail"
   },
   {
     "title": "Next 100 (Kitas 100)",
@@ -819,19 +819,6 @@
     "majors": null
   },
   {
-    "title": "Beca Mexico",
-    "url": "https://educationusa.state.gov/scholarships/beca-mexico",
-    "sponsoringOrg": "University of New Mexico",
-    "type": "university",
-    "openToAllNationalities": false,
-    "eligibleCountry": "Mexico",
-    "deadline": "Fall annually",
-    "degreeLevels": "Undergraduate - Bachelor's \n \n Graduate - Master's \n \n Graduate - Doctorate",
-    "duration": "One year",
-    "maxAward": "50% Discount on the international student tuition fee \n \n \n Contact for more information\n \n \n Contact by e-mail",
-    "majors": null
-  },
-  {
     "title": "The American Chamber of Commerce Charitable Foundation Lyn Edinger U.S. Studies Scholarship",
     "url": "https://educationusa.state.gov/scholarships/american-chamber-commerce-charitable-foundation-lyn-edinger-us-studies-scholarship",
     "sponsoringOrg": null,
@@ -842,6 +829,19 @@
     "degreeLevels": "Undergraduate - Bachelor's",
     "duration": "One year",
     "maxAward": "One-time scholarship award of HK$24,000",
+    "majors": null
+  },
+  {
+    "title": "Beca Mexico",
+    "url": "https://educationusa.state.gov/scholarships/beca-mexico",
+    "sponsoringOrg": "University of New Mexico",
+    "type": "university",
+    "openToAllNationalities": false,
+    "eligibleCountry": "Mexico",
+    "deadline": "Fall annually",
+    "degreeLevels": "Undergraduate - Bachelor's \n \n Graduate - Master's \n \n Graduate - Doctorate",
+    "duration": "One year",
+    "maxAward": "50% Discount on the international student tuition fee \n \n \n Contact for more information\n \n \n Contact by e-mail",
     "majors": null
   },
   {
@@ -949,19 +949,6 @@
     "majors": "Open to all undergraduate majors (conditional admission) \n \n \n Contact for more information\n \n \n Contact by e-mail"
   },
   {
-    "title": "Accepting Fall 2018 applications for UG and ESL",
-    "url": "https://educationusa.state.gov/scholarships/accepting-fall-2018-applications-ug-and-esl",
-    "sponsoringOrg": "Luther College",
-    "type": "university",
-    "openToAllNationalities": false,
-    "eligibleCountry": "Saudi Arabia",
-    "deadline": "September 13",
-    "degreeLevels": "Undergraduate - Bachelor's",
-    "duration": "One year",
-    "maxAward": null,
-    "majors": "All majors \n \n \n Contact for more information\n \n \n Contact by e-mail"
-  },
-  {
     "title": "International Merit Scholarship",
     "url": "https://educationusa.state.gov/scholarships/international-merit-scholarship-3",
     "sponsoringOrg": "East Tennessee State University",
@@ -973,6 +960,19 @@
     "duration": null,
     "maxAward": null,
     "majors": null
+  },
+  {
+    "title": "Accepting Fall 2018 applications for UG and ESL",
+    "url": "https://educationusa.state.gov/scholarships/accepting-fall-2018-applications-ug-and-esl",
+    "sponsoringOrg": "Luther College",
+    "type": "university",
+    "openToAllNationalities": false,
+    "eligibleCountry": "Saudi Arabia",
+    "deadline": "September 13",
+    "degreeLevels": "Undergraduate - Bachelor's",
+    "duration": "One year",
+    "maxAward": null,
+    "majors": "All majors \n \n \n Contact for more information\n \n \n Contact by e-mail"
   },
   {
     "title": "Bahrain Crown Prince International Scholarship Program (CPISP)",
@@ -988,19 +988,6 @@
     "majors": null
   },
   {
-    "title": "Summer Scholarship for Vietnamese Students at George Washington University",
-    "url": "https://educationusa.state.gov/scholarships/summer-scholarship-vietnamese-students-george-washington-university",
-    "sponsoringOrg": null,
-    "type": "university",
-    "openToAllNationalities": false,
-    "eligibleCountry": "Vietnam",
-    "deadline": "May 1st, 2018",
-    "degreeLevels": "Undergraduate - Associate's \n \n Undergraduate - Bachelor's",
-    "duration": "One Semester",
-    "maxAward": "$600",
-    "majors": "2018 Immersion Summer Pre-college Program \n \n \n Contact for more information\n \n \n Contact by e-mail"
-  },
-  {
     "title": "Woodbridge N. Ferris Scholarships",
     "url": "https://educationusa.state.gov/scholarships/woodbridge-n-ferris-scholarships-1",
     "sponsoringOrg": "Ferris State University",
@@ -1012,6 +999,19 @@
     "duration": null,
     "maxAward": null,
     "majors": "All"
+  },
+  {
+    "title": "Summer Scholarship for Vietnamese Students at George Washington University",
+    "url": "https://educationusa.state.gov/scholarships/summer-scholarship-vietnamese-students-george-washington-university",
+    "sponsoringOrg": null,
+    "type": "university",
+    "openToAllNationalities": false,
+    "eligibleCountry": "Vietnam",
+    "deadline": "May 1st, 2018",
+    "degreeLevels": "Undergraduate - Associate's \n \n Undergraduate - Bachelor's",
+    "duration": "One Semester",
+    "maxAward": "$600",
+    "majors": "2018 Immersion Summer Pre-college Program \n \n \n Contact for more information\n \n \n Contact by e-mail"
   },
   {
     "title": "Sesquicentennial Academic Honors Scholarship",
@@ -1118,19 +1118,6 @@
     "majors": "There are 39 approved majors focusing on medicine, engineering, humanities and more. Check MOHE website for a complete list – www.nbaq.edu.kw"
   },
   {
-    "title": "Kuwait Ministry of Higher Education Scholarship Program",
-    "url": "https://educationusa.state.gov/scholarships/kuwait-ministry-higher-education-scholarship-program",
-    "sponsoringOrg": null,
-    "type": "unknown",
-    "openToAllNationalities": false,
-    "eligibleCountry": "Kuwait",
-    "deadline": "Approximately June 15, 2018 \n \n \n \n \n Recurs Annually",
-    "degreeLevels": "Undergraduate - Bachelor's",
-    "duration": "Four years",
-    "maxAward": "Studies fully funded, including one year of English Language.",
-    "majors": "38 majors focusing on medicine, engineering and humanities. Check MOHE website for a complete list."
-  },
-  {
     "title": "Rowe Fund Program",
     "url": "https://educationusa.state.gov/scholarships/rowe-fund-program",
     "sponsoringOrg": null,
@@ -1142,6 +1129,19 @@
     "duration": "Two years",
     "maxAward": "Eligible students can receive up to a $15,000 interest-free loan and an additional $2,000 scholarship. \n \n \n Contact for more information\n \n \n Contact by e-mail",
     "majors": null
+  },
+  {
+    "title": "Kuwait Ministry of Higher Education Scholarship Program",
+    "url": "https://educationusa.state.gov/scholarships/kuwait-ministry-higher-education-scholarship-program",
+    "sponsoringOrg": null,
+    "type": "unknown",
+    "openToAllNationalities": false,
+    "eligibleCountry": "Kuwait",
+    "deadline": "Approximately June 15, 2018 \n \n \n \n \n Recurs Annually",
+    "degreeLevels": "Undergraduate - Bachelor's",
+    "duration": "Four years",
+    "maxAward": "Studies fully funded, including one year of English Language.",
+    "majors": "38 majors focusing on medicine, engineering and humanities. Check MOHE website for a complete list."
   },
   {
     "title": "Platform for Education in Emergencies Response (PEER)",
