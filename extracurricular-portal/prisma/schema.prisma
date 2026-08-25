@@ -1,0 +1,181 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  ADMIN
+}
+
+// A student's account. Admins are students-table rows too (role=ADMIN),
+// since the school's own staff sign in with the same Google Workspace flow.
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      Role     @default(STUDENT)
+  grade     Int? // 1-12, null for admins who aren't also tracked as a class member
+  section   String? // e.g. "A", "B"
+  createdAt DateTime @default(now())
+
+  shortlists     Shortlist[]
+  clicks         ActivityClick[]
+  selfReports    RegistrationSelfReport[]
+  reminderLogs   ReminderLog[]
+  bulkRecipients BulkSendRecipient[]
+  activitiesMade Activity[]               @relation("CreatedBy")
+  bulkSendsMade  BulkSend[]               @relation("SentBy")
+}
+
+model Cluster {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  colorTag    String // used for the UI badge, e.g. "violet" | "emerald" | "amber" ...
+  description String?
+  activities  Activity[]
+}
+
+enum ActivityStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Activity {
+  id          String         @id @default(cuid())
+  title       String
+  organizer   String?
+  summary     String // short one-liner for cards
+  description String // full details, markdown-ish plain text with line breaks
+  link        String // registration / official link
+  fee         String? // free text, e.g. "₹500" or "Free" or "EUR 3,250 (early bird)"
+  mode        String? // "Online" | "Offline" | "Hybrid"
+  location    String?
+
+  minGrade Int // inclusive
+  maxGrade Int // inclusive
+
+  registrationOpensOn DateTime?
+  registrationDeadline DateTime
+  eventDate            DateTime?
+
+  status ActivityStatus @default(DRAFT)
+
+  clusterId String
+  cluster   Cluster @relation(fields: [clusterId], references: [id])
+
+  createdById String
+  createdBy   User   @relation("CreatedBy", fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // traceability back to the source school communication, purely informational
+  sourceNote String?
+
+  clicks       ActivityClick[]
+  selfReports  RegistrationSelfReport[]
+  shortlists   Shortlist[]
+  reminderLogs ReminderLog[]
+  bulkSends    BulkSend[]
+
+  @@index([status])
+  @@index([registrationDeadline])
+}
+
+enum ReminderType {
+  T_MINUS_5
+  MIDPOINT
+  DEADLINE_DAY
+}
+
+// One row per (activity, reminder type, student) actually sent - keeps
+// the daily cron idempotent even if it runs more than once on the same day.
+model ReminderLog {
+  id         String       @id @default(cuid())
+  activityId String
+  activity   Activity     @relation(fields: [activityId], references: [id])
+  studentId  String
+  student    User         @relation(fields: [studentId], references: [id])
+  type       ReminderType
+  sentAt     DateTime     @default(now())
+
+  @@unique([activityId, studentId, type])
+}
+
+model BulkSend {
+  id          String   @id @default(cuid())
+  activityId  String
+  activity    Activity @relation(fields: [activityId], references: [id])
+  sentById    String
+  sentBy      User     @relation("SentBy", fields: [sentById], references: [id])
+  note        String? // optional custom message prepended to the template
+  targetLabel String? // free text describing the audience, e.g. "Grade 9 - Section A"
+  sentAt      DateTime @default(now())
+
+  recipients BulkSendRecipient[]
+}
+
+enum SendStatus {
+  SENT
+  FAILED
+  SKIPPED_NO_ACCOUNT
+}
+
+model BulkSendRecipient {
+  id         String     @id @default(cuid())
+  bulkSendId String
+  bulkSend   BulkSend   @relation(fields: [bulkSendId], references: [id])
+  email      String
+  studentId  String?
+  student    User?      @relation(fields: [studentId], references: [id])
+  status     SendStatus
+
+  @@index([bulkSendId])
+}
+
+enum ClickSource {
+  BROWSE
+  REMINDER_EMAIL
+  BULK_EMAIL
+}
+
+model ActivityClick {
+  id         String      @id @default(cuid())
+  activityId String
+  activity   Activity    @relation(fields: [activityId], references: [id])
+  studentId  String
+  student    User        @relation(fields: [studentId], references: [id])
+  source     ClickSource
+  clickedAt  DateTime    @default(now())
+
+  @@index([activityId])
+}
+
+// Student's own claim of "I've registered" - explicitly self-reported,
+// never verified against the third-party site.
+model RegistrationSelfReport {
+  id         String   @id @default(cuid())
+  activityId String
+  activity   Activity @relation(fields: [activityId], references: [id])
+  studentId  String
+  student    User     @relation(fields: [studentId], references: [id])
+  reportedAt DateTime @default(now())
+
+  @@unique([activityId, studentId])
+}
+
+model Shortlist {
+  id         String   @id @default(cuid())
+  activityId String
+  activity   Activity @relation(fields: [activityId], references: [id])
+  studentId  String
+  student    User     @relation(fields: [studentId], references: [id])
+  addedAt    DateTime @default(now())
+
+  @@unique([activityId, studentId])
+}
