@@ -181,3 +181,88 @@ not urgent bugs.
   international applicants specifically, holistic vs. stats-first review) —
   no structured data source exists for this; would require manual,
   per-school research, not automatable at current scale.
+
+---
+
+## 7. CDS coverage — known gap, deferred
+
+Current state: 391 of 1,944 schools show real CDS-specific data
+(`hasCdsData: true`), down from an inflated (buggy) 1,920/1,399 in earlier
+runs. This is now an honest number, not a bug — but it's likely still an
+undercount versus CollegeData.FYI's own ~699-school archive.
+
+Likely causes, roughly ranked by suspected impact:
+1. Name-matching still misses some real schools — College Scorecard's
+   naming conventions don't always match CollegeData.FYI's search index,
+   even with the fallback search (full name → stripped campus suffix →
+   domain) added earlier.
+2. Population mismatch — CollegeData.FYI's ~699-school archive may include
+   schools outside this project's filter (2-year colleges, grad-only
+   institutions, closed/merged schools) that would never appear in this
+   site's 1,944-school list regardless of matching quality.
+3. Unconfirmed: the 8-second request timeout + 8-way concurrency added for
+   speed could occasionally cause a real match to fail under load — not
+   verified, but can't be ruled out.
+4. Unconfirmed: the domain-as-search-query fallback may not be as
+   effective in practice as the name-based searches.
+
+Decided: not worth chasing further right now. If it becomes a priority
+later, the next step would be pulling the actual list of "no match found"
+schools from a run's log and checking whether well-known, clearly-named
+schools are among them (would confirm #1 is fixable) versus mostly obscure
+institutions (would point to #2 as the bigger, less fixable factor).
+
+---
+
+## 8. Dataset scope — deliberate, not a bug
+
+The site's ~1,944 schools are intentionally filtered to currently-operating
+institutions where a bachelor's degree is the PREDOMINANT degree type
+awarded (via `school.degrees_awarded.predominant=3` in
+`scripts/fetch-data.js`). This is smaller than the full ~6,000+ degree-
+granting postsecondary institutions in the US, because it excludes:
+- 2-year community colleges (predominantly associate's degree)
+- Graduate-only institutions (predominantly master's/doctoral)
+- Schools where bachelor's exists but isn't the primary focus (e.g. a
+  school that has grown mostly into a graduate institution)
+
+Decided: keep this scope. It matches the site's actual purpose — helping
+a prospective undergrad build a shortlist — better than including schools
+that aren't realistic undergrad options.
+
+If this ever needs revisiting: the filter could be loosened from
+"predominantly bachelor's" to "offers bachelor's degrees at all" to catch
+schools with real undergrad programs that aren't currently counted as
+their main focus — worth reconsidering if users report a specific known
+school missing that should reasonably be included.
+
+---
+
+## 9. Basis for Selection (CDS C7) — removed, data source doesn't have it
+
+Attempted to add CDS Section C7 "Basis for Selection" (importance of GPA,
+rigor, recommendations, legacy, demonstrated interest, etc. in admissions
+decisions) based on an assumption that CollegeData.FYI encodes these as
+fields prefixed "c7" + two digits (e.g. "c711_first_gen_factor").
+
+This assumption was WRONG. Verified by dumping every single field
+CollegeData.FYI returns for Harvard (a school with confirmed rich CDS
+data) across both data sources available:
+- `school_facts_unified` table: 62 fields, zero matches
+- `/facts?categories=admissions` endpoint: 32 fields, zero matches
+
+Root cause: the "c7XX" naming was likely a confusion between CDS's own
+official item-numbering scheme (the form itself calls it "Item C7-11:
+First generation") and CollegeData.FYI's actual internal field names,
+which follow a completely different, plainer convention
+(`ed_offered`, `sat_composite_p50`, etc.) — not verified before building
+the feature.
+
+**Lesson for future data additions**: verify a field actually exists by
+checking real API output BEFORE building a feature around it, not after —
+this one cost several debugging rounds that a single upfront check would
+have caught immediately.
+
+**Status**: feature fully removed (fetch script, detail-page section,
+styling). Not worth re-attempting without a different, verified data
+source for this specific content — no known free source has been found.
