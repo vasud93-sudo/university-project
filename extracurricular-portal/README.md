@@ -6,9 +6,9 @@ email, bulk-send specific opportunities to a class, let students browse and
 shortlist activities (with an Excel export), and see who clicked through and
 who self-reported registering.
 
-Built with Next.js (App Router) + Prisma + NextAuth. It's a separate,
-self-contained app inside this repo — it doesn't share any code with the
-university-catalog static site at the repo root.
+Built with Next.js (App Router) + Prisma (Postgres) + NextAuth. It's a
+separate, self-contained app inside this repo — it doesn't share any code
+with the university-catalog static site at the repo root.
 
 ## What's included
 
@@ -32,18 +32,37 @@ It ships seeded with 7 real activities pulled from the school's own Term 1
 Awards, PSAT, IOQM, etc.), a demo student roster across grades 6–12, and a
 demo admin account — so you can see the whole thing working immediately.
 
-## Quick start (demo mode, no external accounts needed)
+This app needs a real, always-running server (not static hosting like
+GitHub Pages) because reminders, logins, tracking, and bulk-send all require
+code that runs continuously and a real database — none of that can exist in
+plain HTML/CSS/JS.
+
+## 1. Get a free Postgres database (needed even to run this locally)
+
+The app needs Postgres — there's no zero-setup local-file fallback. The
+free tier of either works fine for this project's scale:
+
+- **[Neon](https://neon.tech)** (recommended) — sign up, create a project,
+  copy the connection string it gives you (starts with `postgresql://`).
+- **[Supabase](https://supabase.com)** — same idea, under
+  Project Settings → Database → Connection string.
+
+Either way, no credit card is required for the free tier as of writing —
+double check on their pricing pages, since that can change.
+
+## 2. Run it locally
 
 ```bash
 cd extracurricular-portal
 npm install
-npx prisma migrate dev   # creates dev.db
-npm run db:seed          # loads the demo activities, roster & admin
+cp .env.example .env        # then paste your real DATABASE_URL into it
+npx prisma migrate deploy   # applies the committed migration
+npm run db:seed             # loads the demo activities, roster & admin
 npm run dev
 ```
 
 Open http://localhost:3000/login. Demo mode (`DEMO_MODE=true`, already set
-in `.env`) enables a no-password login — sign in as:
+in `.env.example`) enables a no-password login — sign in as:
 
 - **`admin@fountainheadschools.org`** — the admin dashboard
 - **`aarav.mehta@fountainheadschools.org`** (or any other seeded student
@@ -54,7 +73,7 @@ running `npm run dev`, and every send still creates the same database
 records the admin UI reads from (so the "Reminders" and "Tracking" pages
 behave exactly as they would in production).
 
-## Four things worth trying right away
+### Four things worth trying right away
 
 1. **Admin → Reminders**: click "Run today's reminders now". Because the
    demo data includes an activity (IOQM) whose 5-day-before-deadline mark
@@ -67,81 +86,54 @@ behave exactly as they would in production).
    marking "I've registered", check this page (and its Excel export) to see
    it recorded per student.
 
-## Deploying on Railway
+## 3. Deploying on Vercel (recommended — free)
 
-Railway runs this as a real, always-on server (unlike GitHub Pages/Vercel's
-static hosting, it's not "static" — it keeps a Node process running, which
-is what lets the reminder cron and file-based SQLite actually work). Steps:
-
-1. **New Project → Deploy from GitHub repo** → pick this repo. In the
-   service's **Settings → Root Directory**, set it to `extracurricular-portal`
-   (this app lives in a subfolder, not the repo root).
-2. Railway auto-detects Next.js via Nixpacks and picks up `railway.json` in
-   this folder, which sets the start command to
-   `npm run start:railway` (runs `prisma migrate deploy` — applying the
-   already-committed migration — then starts the server).
-3. **Add a Volume** (Settings → Volumes) mounted at `/data`, so the SQLite
-   database file survives restarts and redeploys (container disk is wiped
-   on every deploy otherwise). Skip this step entirely if you'd rather use
-   Postgres — see the alternative below.
-4. **Set environment variables** (Settings → Variables):
+1. **[vercel.com](https://vercel.com) → Add New → Project** → import
+   `vasud93-sudo/university-project` from GitHub.
+2. In the import screen's **Root Directory**, set it to
+   `extracurricular-portal` (this app lives in a subfolder, not the repo
+   root).
+3. **Environment Variables** — add:
    ```
-   DATABASE_URL=file:/data/prod.db
-   AUTH_SECRET=<openssl rand -base64 32>
+   DATABASE_URL=<your Neon/Supabase connection string>
+   AUTH_SECRET=<run: openssl rand -base64 32>
    ADMIN_EMAILS=<your real admin email(s), comma-separated>
-   PORTAL_URL=https://<the-domain-railway-gives-you>.up.railway.app
+   PORTAL_URL=https://<the domain Vercel gives you>.vercel.app
    DEMO_MODE=false
    ```
    Add `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` and
-   `RESEND_API_KEY`/`MAIL_FROM` (or `SMTP_*`) once you have them — see the
-   sections below. Leaving them unset keeps demo-login/console-email mode,
-   which still works fine on Railway if you want to share a working preview
+   `RESEND_API_KEY`/`MAIL_FROM` (or `SMTP_*`) once you have them — see
+   sections 5–6 below. Leaving them unset keeps demo-login/console-email
+   mode, which still works fine if you want to share a working preview
    before wiring up real login/email.
-5. **Deploy.** Once it's live, seed it once: Railway dashboard → your
-   service → the **⋯ menu → Run Command** (or `railway run` from the CLI if
-   you have it linked locally) → `npm run db:seed`.
-6. **Reminder cron**: Railway doesn't have Vercel's per-route cron, but it
-   does let a service run on a schedule. Add a **second, tiny service** in
-   the same project: same repo/root directory, but under that service's
-   **Settings → Cron Schedule** set e.g. `0 8 * * *` (daily 08:00 UTC), and
-   its start command to just:
-   ```
-   curl -sf -H "Authorization: Bearer $CRON_SECRET" https://<your-app-domain>/api/cron/reminders
-   ```
-   (set `CRON_SECRET` on both services to the same value). This second
-   service doesn't need the volume or most of the env vars — just enough to
-   build, which on Railway's Nixpacks means it's simplest to give it a
-   trivial custom build (or point it at a tiny separate script) rather than
-   rebuilding the whole app just to run one `curl`. If that's more setup
-   than you want right now, any external scheduler (cron-job.org, a GitHub
-   Actions scheduled workflow) hitting the same URL works just as well and
-   is simpler to wire up first.
+4. **Deploy.** `vercel.json`'s `buildCommand` already runs
+   `prisma migrate deploy` before `next build`, so the database schema is
+   applied automatically on first deploy — no manual migration step needed.
+5. **Seed it once**: easiest from your own machine —
+   `DATABASE_URL=<the same connection string> npm run db:seed` — since the
+   seed script just needs to reach the database, not the deployed app.
+6. **Reminder cron**: already wired up. `vercel.json` schedules
+   `/api/cron/reminders` daily at 08:00 UTC automatically on Vercel — no
+   extra setup.
 
-**Postgres instead of the SQLite volume** (recommended once you outgrow a
-single-instance demo — needed if you ever scale to more than one replica):
-Railway can provision a Postgres database in the same project
-(**New → Database → PostgreSQL**), which gives you a `DATABASE_URL`
-automatically. To use it, change `prisma/schema.prisma`'s `datasource`
-`provider` from `sqlite` to `postgresql`, delete `prisma/migrations/`, and
-run `npx prisma migrate dev --name init` once **against that real Postgres
-URL** (locally, with `DATABASE_URL` pointed at it) to generate a
-Postgres-flavored initial migration — commit that, then Railway's
-`prisma migrate deploy` (already wired into `start:railway`) applies it on
-every deploy from then on.
+## 4. Deploying elsewhere (Railway, Render, Fly.io, a VPS…)
 
-## Moving from demo to a real deployment (any host)
+Nothing about the app is Vercel-specific — it's a standard Next.js server.
+Moving (now or later) is: point the new host at the same GitHub repo (root
+directory `extracurricular-portal`), set the same environment variables
+(reuse the same Neon/Supabase `DATABASE_URL`, or provision a new Postgres
+on the new host instead), and deploy. The only Vercel-specific piece is the
+cron mechanism in `vercel.json` — everywhere else, hit
+`/api/cron/reminders` daily from whatever scheduler that host offers (or an
+external one like cron-job.org / a GitHub Actions scheduled workflow),
+sending header `Authorization: Bearer $CRON_SECRET` if you've set
+`CRON_SECRET` (recommended, so randoms can't trigger it).
 
-The Railway section above is the fastest path; everything below applies
-wherever you end up hosting it — nothing in the code changes, only
-environment variables (see `.env.example`).
+`railway.json` is included for exactly this — Railway auto-detects it and
+runs `npm run start:railway` (`prisma migrate deploy && next start`) with
+no extra config beyond the environment variables above.
 
-### 1. Database
-
-Any Postgres host works the same way as the Railway Postgres option above —
-set `DATABASE_URL`, switch the schema provider, regenerate migrations
-against it once. Neon and Supabase both have a free tier.
-
-### 2. Google Sign-In (for real student/staff login)
+## 5. Google Sign-In (for real student/staff login)
 
 1. In Google Cloud Console, create an OAuth 2.0 Client ID (Web application).
 2. Authorized redirect URI: `https://<your-domain>/api/auth/callback/google`.
@@ -154,7 +146,7 @@ The **first** person who signs in with an email listed in `ADMIN_EMAILS`
 student. You can promote/demote anyone later by editing their `role`
 directly in the database.
 
-### 3. Email sending
+## 6. Email sending
 
 Pick one (leaving both unset keeps demo/console mode):
 
@@ -166,17 +158,7 @@ Pick one (leaving both unset keeps demo/console mode):
 See `src/lib/mailer.ts` — this is the only file that would need to change to
 add another provider.
 
-### 4. Daily reminder cron
-
-On Railway, see the cron step in the Railway section above. `vercel.json` is
-also included, which schedules `/api/cron/reminders` daily at 08:00 UTC if
-you deploy on Vercel instead — no extra setup there. On any other host: hit
-that same URL once a day from any scheduler (cron-job.org, a GitHub Actions
-scheduled workflow, etc.), sending header
-`Authorization: Bearer $CRON_SECRET` if you've set `CRON_SECRET`
-(recommended, so randoms can't trigger it).
-
-### 5. Roster
+## 7. Roster
 
 Upload your real student list from **Admin → Roster** (CSV: `name, email,
 grade, section`). Re-uploading updates existing students by email, so it's
