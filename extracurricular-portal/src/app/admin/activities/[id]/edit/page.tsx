@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { BackLink } from "@/components/BackLink";
 import { ActivityForm, ActivityFormValues } from "../../ActivityForm";
 
 const toDateInput = (d: Date | null) => (d ? d.toISOString().slice(0, 10) : "");
@@ -34,6 +35,7 @@ export default async function EditActivityPage({ params }: { params: Promise<{ i
 
   return (
     <div className="mx-auto max-w-3xl w-full px-6 py-8 flex-1">
+      <BackLink href="/admin/activities" label="Back to activities" />
       <h1 className="text-2xl font-semibold tracking-tight mb-1">Edit activity</h1>
       <p className="text-sm text-muted mb-8">{activity.title}</p>
       <ActivityForm clusters={clusters} initialValues={initialValues} />
