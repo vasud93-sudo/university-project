@@ -17,18 +17,32 @@ const adminLinks = [
   { href: "/admin/roster", label: "Roster" },
 ];
 
+const STUDENT_ROUTE_PREFIXES = ["/browse", "/activity", "/shortlist"];
+
 export function TopNav() {
   const { data: session, status } = useSession();
   const pathname = usePathname();
 
   if (pathname === "/login") return null;
 
-  const links = session?.user.role === "ADMIN" ? adminLinks : studentLinks;
+  const isAdmin = session?.user.role === "ADMIN";
+  const onStudentRoute = STUDENT_ROUTE_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + "/"));
+  const isPreviewing = isAdmin && onStudentRoute;
+
+  const links = isAdmin && !isPreviewing ? adminLinks : studentLinks;
 
   return (
     <header className="border-b border-border bg-surface/80 backdrop-blur sticky top-0 z-40">
+      {isPreviewing && (
+        <div className="bg-amber-50 border-b border-amber-200 text-amber-800 text-xs font-medium text-center py-1.5">
+          Admin preview — this is what a student sees.{" "}
+          <Link href="/admin/activities" className="underline hover:no-underline">
+            Exit preview
+          </Link>
+        </div>
+      )}
       <div className="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between gap-6">
-        <Link href={session?.user.role === "ADMIN" ? "/admin/activities" : "/browse"} className="flex items-center gap-2 shrink-0">
+        <Link href={isAdmin && !isPreviewing ? "/admin/activities" : "/browse"} className="flex items-center gap-2 shrink-0">
           <span className="h-7 w-7 rounded-lg bg-primary text-white grid place-items-center text-sm font-bold">EA</span>
           <span className="font-semibold text-sm hidden sm:inline">Extracurricular Activities</span>
         </Link>
@@ -53,12 +67,20 @@ export function TopNav() {
         )}
 
         <div className="flex items-center gap-3 shrink-0">
+          {status === "authenticated" && isAdmin && (
+            <Link
+              href={isPreviewing ? "/admin/activities" : "/browse"}
+              className="hidden sm:inline-flex text-sm font-medium text-muted hover:text-foreground border border-border rounded-full px-3 py-1.5"
+            >
+              {isPreviewing ? "Exit preview" : "Preview as student"}
+            </Link>
+          )}
           {status === "authenticated" && (
             <>
               <span className="hidden md:flex flex-col items-end leading-tight">
                 <span className="text-sm font-medium">{session.user.name}</span>
                 <span className="text-xs text-muted">
-                  {session.user.role === "ADMIN" ? "Admin" : session.user.grade ? `Grade ${session.user.grade}` : "Student"}
+                  {isAdmin ? (isPreviewing ? "Admin (previewing)" : "Admin") : session.user.grade ? `Grade ${session.user.grade}` : "Student"}
                 </span>
               </span>
               <button

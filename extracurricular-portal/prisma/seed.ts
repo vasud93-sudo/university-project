@@ -29,6 +29,7 @@ async function main() {
     { name: "Global Programs & Entrepreneurship", colorTag: "amber", description: "International camps, summer schools, business programs" },
     { name: "Arts, Design & Architecture", colorTag: "rose", description: "Design, architecture & creative enrichment" },
     { name: "Sports & Leadership", colorTag: "teal", description: "Athletics, MUN, and leadership programs" },
+    { name: "Awards & Recognition", colorTag: "fuchsia", description: "Nominations, honours, and scholarships recognising student achievement" },
   ];
   const clusters: Record<string, string> = {};
   for (const c of clusterDefs) {
@@ -59,6 +60,19 @@ async function main() {
     { name: "Vivaan Joshi", email: "vivaan.joshi@fountainheadschools.org", grade: 11, section: "A" },
     { name: "Ananya Desai", email: "ananya.desai@fountainheadschools.org", grade: 12, section: "A" },
     { name: "Rohan Gupta", email: "rohan.gupta@fountainheadschools.org", grade: 12, section: "A" },
+
+    // Real staff emails, added at the school's request purely to test that
+    // reminder/bulk-send emails actually deliver to a real inbox - grouped
+    // under grade 9, section "DEMO TEST" so they're a clearly separate,
+    // easy-to-pick target in Admin > Bulk send and don't get mixed into the
+    // real student roster. Five of these match the real grade-wise career
+    // counsellors named in the school's own communications doc.
+    { name: "Richik Sil", email: "richik.sil@fountainheadschools.org", grade: 9, section: "DEMO TEST" },
+    { name: "Nishtha Contractor", email: "nishtha.contractor@fountainheadschools.org", grade: 9, section: "DEMO TEST" },
+    { name: "Ananya Bajaj", email: "ananya.bajaj@fountainheadschools.org", grade: 9, section: "DEMO TEST" },
+    { name: "Devanshi Kinariwala", email: "devanshi.kinariwala@fountainheadschools.org", grade: 9, section: "DEMO TEST" },
+    { name: "Carol Vaid", email: "carol.vaid@fountainheadschools.org", grade: 9, section: "DEMO TEST" },
+    { name: "Rushali Kapadia", email: "rushali.kapadia@fountainheadschools.org", grade: 9, section: "DEMO TEST" },
   ];
   const studentIds: Record<string, string> = {};
   for (const s of students) {
@@ -70,11 +84,23 @@ async function main() {
     studentIds[s.email] = row.id;
   }
 
-  // --- Activities, extracted from Communications #22, 24, 25, 27, 28, 29 -
-  // and #13, of the school's own Term 1 2026-27 document. Dates are as
-  // stated there; four activities (marked below) never had a literal URL in
-  // the source text (just linked button text like "Click Here") so they use
-  // an example.com placeholder - swap in the real link before real use.
+  // --- Activities, extracted from all genuinely activity-shaped
+  // communications (a single opportunity with eligibility + a deadline/link)
+  // in the school's own Term 1 2026-27 document - Communications #1, 2, 3, 4,
+  // 12, 13, 20, 21, 22, 24, 25, 27, 28, 29. The rest of the 29 communications
+  // were skipped: internal notices, guidance/informational sessions, surveys,
+  // and celebratory posts with no single registration link/deadline to model
+  // (#5-11 excl. those listed, #14-19, #23, #26), plus BTEC (#11), whose
+  // registration window is individualized per student's enrollment date
+  // rather than a fixed calendar deadline.
+  //
+  // Several activities never had a literal URL in the source text (just
+  // linked button text like "Click Here") so they use an example.com
+  // placeholder - swap in the real link before real use, each one flagged in
+  // its own sourceNote below. Communications whose real-world date has
+  // already passed relative to today are seeded as ARCHIVED rather than
+  // PUBLISHED, so they stay out of student browsing but remain visible to
+  // admins as a historical record.
   const activityDefs = [
     {
       title: "Harvard Undergraduate Science Olympiad (HUSO) 2026",
@@ -263,6 +289,196 @@ Exam date: 6 September 2026 (Sunday).`,
       status: "PUBLISHED" as const,
       clusterId: clusters["STEM & Olympiads"],
       sourceNote: "Communication 13 — source note didn't state an explicit registration deadline (only the exam date, 6 Sept); deadline here is inferred as ~1 week before the exam.",
+    },
+    {
+      title: "IRIS National Fair 2026–27",
+      organizer: "Community for the Advancement of Science & Technology, official path to Regeneron ISEF",
+      summary: "India's premier pre-collegiate research fair — and the official selection platform for Team India at Regeneron ISEF, the world's largest school science fair.",
+      description: `India's premier pre-collegiate research competition and the official platform for selecting Team India for the Regeneron International Science and Engineering Fair (ISEF), the world's largest international science and engineering competition.
+
+Why participate
+• Conduct original research under the guidance of mentors
+• Develop critical thinking, scientific inquiry, and problem-solving skills
+• Present your work before eminent scientists and researchers
+• Strengthen your university applications with real research experience
+• Top-performing projects earn the opportunity to represent India at Regeneron ISEF
+
+Timeline
+• Submission Window 1: 15 August 2026
+• Submission Window 2: 15 October 2026
+• National Fair: November 2026 (for shortlisted finalists)
+• ISEF Preparation & Mentoring: January–April 2027
+• Regeneron ISEF 2027: 8–14 May 2027 (Los Angeles, USA)
+
+What you can work on: original research or engineering projects across Biology, Chemistry, Physics, Computer Science, Mathematics, Biomedical Sciences, Environmental Science, Engineering, Robotics, and AI. Open to Classes 5–12.`,
+      link: "https://iris.exstemplar.com/",
+      fee: null,
+      mode: "Submission online; National Fair in-person for finalists",
+      minGrade: 5,
+      maxGrade: 12,
+      registrationOpensOn: d("2026-08-15"),
+      registrationDeadline: d("2026-10-15"),
+      eventDate: null,
+      status: "PUBLISHED" as const,
+      clusterId: clusters["Innovation & Research"],
+      sourceNote: "Communication 21 — two submission windows (15 Aug / 15 Oct 2026); using the later one as the effective deadline.",
+    },
+    {
+      title: "Letter of Excellence Award — Nomination",
+      organizer: "Fountainhead School Career Counselling Team",
+      summary: "Nominate yourself for school-wide recognition in Sports, Arts, Leadership, or Service to Society.",
+      description: `The Letter of Excellence recognizes students who have shown commitment, effort, and achievement across multiple areas of school life.
+
+Categories open for nomination
+• Excellence in Sports
+• Excellence in Arts (Visual/Fine/Performing Arts)
+• Leadership (Club/Events/Activity)
+• Service to Society (Service & Community Engagement)
+
+Note: Academic Excellence isn't included here — that category is shortlisted by the school directly, based on academic scores.
+
+Review the requirements for your category carefully and provide clear, specific evidence to support your nomination. Fill out the form as soon as possible — the committee needs sufficient time to review all nominations and finalize the list.`,
+      link: "https://docs.google.com/forms/d/e/1FAIpQLScH3lWRQjSl-OhbNLoYoGcc1OwbdKuAN9GBkodT0bP2az1Mvg/viewform?usp=preview",
+      fee: "Free",
+      mode: "Online nomination form",
+      minGrade: 9,
+      maxGrade: 12,
+      registrationOpensOn: null,
+      registrationDeadline: d("2026-09-30"),
+      eventDate: null,
+      status: "PUBLISHED" as const,
+      clusterId: clusters["Awards & Recognition"],
+      sourceNote: "Communication 20 — no fixed deadline was stated in the source ('fill as soon as possible'); Sept 30, 2026 used as a reasonable placeholder target. Replace with the real committee deadline.",
+    },
+    {
+      title: "OxfordMUN India / Harvard Sustainability Impact Summit (HSIS) 2026",
+      organizer: "FLAME University, Pune — in partnership with Oxford and Harvard PAIR",
+      summary: "Two internationally acclaimed student conferences held together at FLAME University — Model UN diplomacy, or a policy-driven sustainability summit.",
+      description: `Two internationally acclaimed student programs held simultaneously at FLAME University, Pune. Each student may register for only one.
+
+OxfordMUN India 2026 — a premier Model United Nations experience rooted in diplomacy, public speaking, and global affairs. Specialized committees with limited seats, mentorship from Oxford alumni, an Innovation Challenge with a 100% scholarship prize, and a path to the OxfordMUN Home Conference in the UK for Best Delegates. Individual or school-delegation participation.
+
+Harvard Sustainability Impact Summit (HSIS) 2026 — a policy-driven, team-based summit addressing real-world sustainability challenges. Policy Labs led by Harvard PAIR mentors, a Changemakers Challenge with a 100% scholarship prize, and a path to the Harvard PAIR Home Conference in the US for winning teams. Requires a 4-student team.
+
+Details
+• Dates: August 3–5, 2026
+• Venue: FLAME University, Pune
+• Eligibility: Grades 9–12, no academic prerequisites
+• Fee: INR 30,000 per delegate (includes accommodation, 14 meals, airport/station transfers, delegate kit, and full session access)
+
+If enough Fountainhead students register, a school teacher will accompany the delegation.`,
+      link: "https://example.com/register/oxfordmun-hsis-2026",
+      fee: "₹30,000 per delegate",
+      mode: "Offline — FLAME University, Pune",
+      location: "FLAME University, Pune",
+      minGrade: 9,
+      maxGrade: 12,
+      registrationOpensOn: null,
+      registrationDeadline: d("2026-07-27"),
+      eventDate: d("2026-08-03"),
+      status: "ARCHIVED" as const,
+      clusterId: clusters["Sports & Leadership"],
+      sourceNote: "Communication 12 — the event (Aug 3-5, 2026) has already passed; kept as an archived record. Registration links were 'Form' buttons in the source doc, not literal URLs — placeholder link.",
+    },
+    {
+      title: "Surat Summer School 2026 — Immersive Career Exploration",
+      organizer: "In partnership with NMIMS, FLAME, Masters' Union, KREA, Ahmedabad University, Mahindra University, UID, and Bennett University",
+      summary: "A 6-day immersive bootcamp series — AI, entrepreneurship, design thinking, media, and more — taught by faculty from India's top universities.",
+      description: `A 6-day (18th–23rd May 2026) immersive experience bringing the expertise of India's top universities directly to Surat. Unlike typical education fairs, this program features direct mentorship and teaching from faculty of NMIMS, FLAME, Masters' Union, KREA, Ahmedabad University, Mahindra University, UID, and Bennett University.
+
+Highlights
+• 12 specialised bootcamps: AI, Entrepreneurship, Design Thinking, Media, Liberal Arts, Engineering, and more
+• Real-world projects, simulations, and hands-on learning
+• Certification for bootcamps completed
+• Some participating universities may run spot admission rounds for attendees
+• Limited to ~45 students for high mentor interaction
+
+Fee: standard ₹8,000, discounted to ₹6,500 for Fountainhead students.`,
+      link: "https://example.com/register/surat-summer-school-2026",
+      fee: "₹6,500 (discounted from ₹8,000)",
+      mode: "Offline — Surat",
+      location: "Surat",
+      minGrade: 10,
+      maxGrade: 11,
+      registrationOpensOn: null,
+      registrationDeadline: d("2026-05-10"),
+      eventDate: d("2026-05-18"),
+      status: "ARCHIVED" as const,
+      clusterId: clusters["Global Programs & Entrepreneurship"],
+      sourceNote: "Communication 4 — the event (18-23 May 2026) has already passed; kept as an archived record. Link was a 'Fill the Google Form Here' button, not a literal URL — placeholder.",
+    },
+    {
+      title: "NID Continuing Education Programme (CEP) — Summer 2026",
+      organizer: "National Institute of Design (NID)",
+      summary: "Short, intensive 5-day design workshops for middle and high schoolers — watercolor portraiture, clay modeling, photo narratives, and kinetic geometry.",
+      description: `Short-term, intensive summer workshops introducing middle and high school students to fundamental design concepts and hands-on creative practice.
+
+Why consider it
+• Skill building through guided exercises in product design, visual communication, and digital storytelling
+• Portfolio enhancement for students building a design-focused profile
+• Exposure to the teaching methodology of India's premier design institute
+• Short-format — fits into the summer break without a long-term commitment
+
+Workshops by grade
+• Grades 8–9: Portrait with Watercolor, Clay Modeling to Create Watercolor
+• Grades 10–12: Photo Narratives, Kinetic Geometry
+
+Duration: 5 full-day sessions, 10 AM–5 PM, held between mid-May and the first week of June 2026 at the Ahmedabad and Bengaluru campuses (non-residential — students arrange their own travel/stay). Registrations are first-come, first-served; a group of 4 gets a discount.`,
+      link: "https://example.com/register/nid-cep-summer-2026",
+      fee: "Varies by workshop; group-of-4 discount available",
+      mode: "Offline — Ahmedabad & Bengaluru campuses",
+      location: "Ahmedabad / Bengaluru",
+      minGrade: 8,
+      maxGrade: 12,
+      registrationOpensOn: null,
+      registrationDeadline: d("2026-05-15"),
+      eventDate: d("2026-05-15"),
+      status: "ARCHIVED" as const,
+      clusterId: clusters["Arts, Design & Architecture"],
+      sourceNote: "Communication 3 — the program window (mid-May to early June 2026) has already passed; kept as an archived record. Registration was first-come-first-served with no fixed deadline stated. Link was an 'Official Link' button, not a literal URL — placeholder.",
+    },
+    {
+      title: "CEPT Summer Exhibition 2026",
+      organizer: "CEPT University, Ahmedabad",
+      summary: "An open public exhibition of studio work from 96 design, architecture, and planning units — worth a visit for anyone considering CEPT.",
+      description: `CEPT University, Ahmedabad hosts their Summer Exhibition 2026 — an open public exhibition showcasing studio work from 96 units conducted by 167 faculty members across Architecture, Design, Technology, Planning, Management, and the CEPT Foundation Program.
+
+Features student outcomes including drawings, models, portfolios, and visual explorations — a great chance to see how design thinking is practiced and presented at one of India's leading design institutions.
+
+Timings: 10 AM – 8 PM daily. Venue: FA Building (A02), First Floor, CEPT Campus, Ahmedabad.`,
+      link: "https://cept.ac.in/events/2026/summer-exhibition-2026",
+      fee: "Free (open to the public)",
+      mode: "Offline — CEPT Campus, Ahmedabad",
+      location: "CEPT Campus, Ahmedabad",
+      minGrade: 12,
+      maxGrade: 12,
+      registrationOpensOn: null,
+      registrationDeadline: d("2026-05-16"),
+      eventDate: d("2026-05-12"),
+      status: "ARCHIVED" as const,
+      clusterId: clusters["Arts, Design & Architecture"],
+      sourceNote: "Communication 2 — exhibition dates (12-16 May 2026) have already passed; kept as an archived record. No registration is actually required (open exhibition) — the 'deadline' here represents the exhibition's last day to visit.",
+    },
+    {
+      title: "Ellison Scholars — Undergraduate Applications (University of Oxford)",
+      organizer: "Ellison Institute of Technology (EIT), University of Oxford",
+      summary: "A fully-funded Oxford undergraduate scholarship plus a paid internship, for future global innovators in science and technology.",
+      description: `The Ellison Institute of Technology (EIT) has launched a scholarship at the University of Oxford, empowering exceptional individuals to become global innovators solving humanity's most enduring problems through science and technology.
+
+The programme provides full funding for undergraduate studies at Oxford, plus a paid internship to work on world-benefiting problems during the academic year and summers.
+
+Applicants are encouraged to attend an online information session and subscribe to the program's newsletter before applying.`,
+      link: "https://example.com/register/ellison-scholars-oxford",
+      fee: "Free to apply (fully funded scholarship)",
+      mode: "Online application",
+      minGrade: 12,
+      maxGrade: 12,
+      registrationOpensOn: d("2026-05-01"),
+      registrationDeadline: d("2026-07-31"),
+      eventDate: null,
+      status: "ARCHIVED" as const,
+      clusterId: clusters["Awards & Recognition"],
+      sourceNote: "Communication 1 — the application window (1 May – 31 July 2026) has already closed; kept as an archived record. Link wasn't captured as a literal URL in the source doc — placeholder, replace with the real Ellison Scholars application URL before reuse.",
     },
   ];
 
